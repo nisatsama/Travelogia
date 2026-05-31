@@ -6,6 +6,8 @@
 ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
 ![Vercel](https://img.shields.io/badge/Frontend-Vercel-black)
 ![Render](https://img.shields.io/badge/Backend-Render-purple)
+
+---
 A full-stack travel booking web application built using the MERN stack that allows users to explore destinations, save favorites, manage bookings, and plan their trips through a modern and responsive user interface.
 
 ## 🚀 Live Demo
@@ -249,7 +251,7 @@ Aspiring Software Developer
 
 GitHub: https://github.com/nisatsama
 
-LinkedIn: linkedin.com/in/nisat-sama-aa02a53a3
+LinkedIn: http://linkedin.com/in/nisat-sama-aa02a53a3
 
 ---
 
