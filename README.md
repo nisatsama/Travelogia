@@ -1,53 +1,71 @@
+
 # 🌍 Travelogia
+![React](https://img.shields.io/badge/React-18-blue)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-brightgreen)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange)
+![Vercel](https://img.shields.io/badge/Frontend-Vercel-black)
+![Render](https://img.shields.io/badge/Backend-Render-purple)
+A full-stack travel booking web application built using the MERN stack that allows users to explore destinations, save favorites, manage bookings, and plan their trips through a modern and responsive user interface.
 
-**Travelogia** is a full-stack MERN travel booking platform that helps users discover destinations, explore travel packages, save favorites, and book memorable trips with ease.
+## 🚀 Live Demo
 
-Designed with a modern user experience and secure authentication system, Travelogia provides a seamless journey from destination discovery to trip booking.
+**Frontend:** https://travelogia-8m7e.vercel.app/
+
+**Backend API:** https://travelogia-nfpk.onrender.com/
+
+---
+
+## 📖 Overview
+
+Travelogia is a travel exploration and booking platform designed to provide users with an intuitive way to discover destinations and manage their travel plans.
+
+The application includes secure authentication, destination search, booking management, favorite destinations, and a personalized user dashboard.
+
+This project was built to strengthen my full-stack development skills, covering frontend development, backend API design, database management, authentication, deployment, and real-world application architecture.
 
 ---
 
 ## ✨ Features
 
-### 👤 User Authentication
+### User Authentication
 
-* Secure user registration and login
-* JWT-based authentication
-* Protected routes
-* Persistent user sessions
+* User Registration
+* User Login & Logout
+* JWT Authentication
+* Protected Routes
 
-### 🌎 Explore Destinations
+### Destination Management
 
-* Browse travel destinations from the database
-* View detailed information about each destination
-* Search destinations by place or country
-* Responsive destination cards
+* Browse Destinations
+* Search Destinations
+* View Destination Details
+* Responsive Destination Cards
 
-### ❤️ Favorites System
+### Booking System
 
-* Save destinations to favorites
-* View favorite destinations in profile
-* Personalized travel experience
+* Book Travel Destinations
+* View Booking History
+* Manage User Bookings
 
-### 🎫 Booking Management
+### Favorites
 
-* Book travel packages
-* Store booking details in MongoDB
-* View booking history
-* Manage reservations efficiently
+* Add Destinations to Favorites
+* Remove Favorites
+* Personalized Favorite List
 
-### 👨‍💼 Admin Features
+### User Dashboard
 
-* Add new travel destinations
-* Manage travel packages
-* Update destination information
-* Control platform content
+* Profile Information
+* Booking Overview
+* Favorite Destinations
+* User Account Management
 
-### 👤 User Dashboard
+### Responsive Design
 
-* User profile management
-* Booking overview
-* Favorite destinations section
-* Clean and responsive UI
+* Mobile Friendly
+* Tablet Friendly
+* Desktop Optimized
 
 ---
 
@@ -72,8 +90,13 @@ Designed with a modern user experience and secure authentication system, Travelo
 
 ### Authentication
 
-* JWT (JSON Web Tokens)
+* JSON Web Tokens (JWT)
 * bcrypt.js
+
+### Deployment
+
+* Vercel (Frontend)
+* Render (Backend)
 
 ### Version Control
 
@@ -84,125 +107,152 @@ Designed with a modern user experience and secure authentication system, Travelo
 
 ## 📂 Project Structure
 
-```bash
 Travelogia/
-│
+
 ├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
+
+│ ├── src/
+
+│ ├── components/
+
+│ ├── pages/
+
+│ ├── assets/
+
+│ └── App.js
+
 │
+
 ├── backend/
-│   ├── model/
-│   ├── routes/
-│   ├── middleware/
-│   ├── data/
-│   ├── app.js
-│   └── package.json
+
+│ ├── models/
+
+│ ├── routes/
+
+│ ├── controllers/
+
+│ ├── middleware/
+
+│ └── app.js
+
 │
+
 └── README.md
-```
-
----
-
-## 🚀 Installation
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/nisatsama/Travelogia.git
-cd Travelogia
-```
-
-### Backend Setup
-
-```bash
-cd backend
-npm install
-```
-
-Create a `.env` file:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-PORT=5000
-```
-
-Start the backend server:
-
-```bash
-npm start
-```
-
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-The application will run on:
-
-```text
-Frontend: http://localhost:3000
-Backend: http://localhost:5000
-```
 
 ---
 
 ## 📸 Screenshots
 
-Add screenshots here after deployment:
+<h3>Home Page</h3>
 
-* Home Page
-* Destination Listings
-* Destination Details
-* Favorites Page
-* User Profile
-* Booking System
-* Admin Dashboard
+<img src="./public/Home1.png" width 800>
+<img src="./public/Home2.png" width 800>
+
+<h3>Destinations Page</h3>
+
+<img src="./public/Destinations.png" width 800>
+
+<h3>Booking Page</h3>
+
+<img src="./public/Booking.png" width 800>
+
+<h3>User Dashboard</h3>
+
+<img src="./public/Profile.png" width 800>
+
+
+
+## ⚙️ Installation
+
+### Clone Repository
+
+
+git clone https://github.com/yourusername/Travelogia.git
+cd Travelogia
+
+
+### Backend Setup
+
+
+cd backend
+npm install
+
+
+Create a .env file:
+
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+PORT=5000
+
+
+Run Backend:
+
+
+npm start
+
+
+### Frontend Setup
+
+
+cd frontend
+npm install
+npm run dev
+
+
+---
+
+## 🧠 Challenges Faced
+
+* Implementing secure JWT-based authentication
+* Managing user-specific bookings and favorites
+* Connecting React frontend with Express backend APIs
+* Handling deployment on Render and Vercel
+* Managing environment variables securely
+* Designing responsive UI components
 
 ---
 
 ## 🎯 Future Improvements
 
 * Payment Gateway Integration
-* AI-Based Travel Recommendations
-* Hotel Booking Support
-* Travel Reviews and Ratings
-* Dark Mode
+* AI Travel Recommendation System
+* Hotel Booking Integration
 * Email Notifications
-* Real-Time Availability Tracking
+* User Reviews & Ratings
+* Admin Dashboard
+* Advanced Filters and Sorting
 
 ---
 
-## 📚 Learning Outcomes
+## 📚 What I Learned
 
-Through this project, I gained practical experience with:
+Through this project, I gained hands-on experience with:
 
-* Full-Stack MERN Development
-* REST API Development
+* Building RESTful APIs
+* React State Management
 * Authentication & Authorization
-* MongoDB Database Design
-* State Management in React
-* Backend Integration
-* Git & GitHub Workflow
-* Project Deployment
+* MongoDB Data Modeling
+* Deployment Workflows
+* Git & GitHub Collaboration
+* Full-Stack Application Development
 
 ---
 
 ## 👩‍💻 Author
 
-**Nisat Sama**
+Nisat Sama
 
-B.Tech Computer Science Engineering Student
+B.Tech Computer Science Engineering
+
+Aspiring Software Developer
 
 GitHub: https://github.com/nisatsama
+
+LinkedIn: linkedin.com/in/nisat-sama-aa02a53a3
 
 ---
 
 ## ⭐ Support
 
-If you found this project interesting, consider giving it a ⭐ on GitHub.
+If you found this project useful, consider giving it a star on GitHub.
