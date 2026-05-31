@@ -24,7 +24,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://travelogia.vercel.app"],
+    origin: ["http://localhost:5173", "https://travelogia-8m7e.vercel.app"],
     credentials: true,
   }),
 );
