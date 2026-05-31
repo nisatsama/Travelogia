@@ -25,7 +25,7 @@ function Home() {
   }, [search, destinations]);
   useEffect(() => {
     axios
-      .get("http://localhost:8080/travels")
+      .get("https://travelogia-nfpk.onrender.com/travels")
       .then((res) => {
         setDestinations(res.data);
       })

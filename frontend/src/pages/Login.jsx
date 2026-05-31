@@ -29,7 +29,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:8080/login", formData);
+      const res = await axios.post(
+        "https://travelogia-nfpk.onrender.com/login",
+        formData,
+      );
 
       // Save token
       if (res.data.token) {

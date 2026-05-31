@@ -41,7 +41,10 @@ const Signup = () => {
         password: formData.password,
       };
 
-      await axios.post("http://localhost:8080/signup", submitData);
+      await axios.post(
+        "https://travelogia-nfpk.onrender.com/signup",
+        submitData,
+      );
 
       // Redirect directly to login upon successful registration
       navigate("/login");

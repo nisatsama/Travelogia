@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     // Fetch message
     axios
-      .get("http://localhost:8080/")
+      .get("https://travelogia-nfpk.onrender.com/")
       .then((res) => {
         setMessage(res.data.message);
       })
@@ -29,7 +29,7 @@ function App() {
 
     // Fetch travel data
     axios
-      .get("http://localhost:8080/travels")
+      .get("https://travelogia-nfpk.onrender.com/travels")
       .then((res) => {
         setTravels(res.data);
       })

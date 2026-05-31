@@ -12,7 +12,7 @@ const Details = () => {
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/travels/${id}`)
+      .get(`https://travelogia-nfpk.onrender.com/travels/${id}`)
       .then((res) => {
         setTravel(res.data);
         setLoading(false);
@@ -45,7 +45,7 @@ const Details = () => {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:8080/favorites",
+        "https://travelogia-nfpk.onrender.com/favorites",
         {
           travelId: travel._id,
         },

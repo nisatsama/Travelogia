@@ -29,11 +29,14 @@ const Profile = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:8080/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const res = await axios.get(
+          "https://travelogia-nfpk.onrender.com/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         setUser(res.data.user);
         setFavorites(res.data.favorites || []);

@@ -35,7 +35,7 @@ function Booking() {
       };
 
       const res = await axios.post(
-        "http://localhost:8080/bookings",
+        "https://travelogia-nfpk.onrender.com/bookings",
         bookingData,
         {
           headers: {
