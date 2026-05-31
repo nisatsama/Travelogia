@@ -1,0 +1,142 @@
+/* ==========================
+   GALLERY PAGE
+========================== */
+
+.gallery-page {
+  min-height: 100vh;
+  padding: 100px 7%;
+  background:
+    radial-gradient(circle at top left, #4f46e520, transparent 35%),
+    radial-gradient(circle at bottom right, #06b6d420, transparent 35%),
+    linear-gradient(135deg, #f8fafc, #eef6ff);
+}
+
+.gallery-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.gallery-header h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 15px;
+}
+
+.gallery-header p {
+  max-width: 800px;
+  margin: auto;
+  font-size: 1.15rem;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+/* Masonry Layout */
+
+.gallery-grid {
+  columns: 4 250px;
+  column-gap: 20px;
+}
+
+.gallery-card {
+  position: relative;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border-radius: 24px;
+  cursor: pointer;
+  break-inside: avoid;
+  background: white;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.gallery-card img {
+  width: 100%;
+  display: block;
+  transition: all 0.7s ease;
+}
+
+.gallery-card:hover img {
+  transform: scale(1.12);
+}
+
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.15));
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 25px;
+  color: white;
+
+  opacity: 0;
+  transition: 0.4s ease;
+}
+
+.gallery-card:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-overlay h3 {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.gallery-overlay span {
+  display: inline-block;
+  width: fit-content;
+  padding: 6px 14px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  font-size: 0.9rem;
+}
+
+/* Floating Animation */
+
+.gallery-card {
+  animation: floatUp 1s ease;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 992px) {
+  .gallery-header h1 {
+    font-size: 3rem;
+  }
+
+  .gallery-grid {
+    columns: 3 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-grid {
+    columns: 2 180px;
+  }
+
+  .gallery-header h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .gallery-grid {
+    columns: 1;
+  }
+}

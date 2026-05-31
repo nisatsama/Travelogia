@@ -1,0 +1,286 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.profile-Profile {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: "Poppins", sans-serif;
+  padding: 40px;
+}
+
+/* LOADING */
+
+.Profile-loading {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* PROFILE HEADER */
+
+.profile-card {
+  background: white;
+  border-radius: 25px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
+}
+
+.profile-avatar {
+  font-size: 6rem;
+  color: #2563eb;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h1 {
+  color: #0f172a;
+  margin-bottom: 8px;
+  font-size: 2rem;
+}
+
+.profile-info p {
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.edit-btn,
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.edit-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* STATS */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+}
+
+.stat-card svg {
+  font-size: 2rem;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+
+.stat-card h2 {
+  font-size: 2rem;
+  color: #0f172a;
+  margin-bottom: 5px;
+}
+
+.stat-card p {
+  color: #64748b;
+}
+
+/* SECTION */
+
+.Profile-section {
+  margin-bottom: 60px;
+}
+
+.Profile-section h2 {
+  margin-bottom: 25px;
+  color: #0f172a;
+  font-size: 1.8rem;
+}
+
+/* BOOKINGS */
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.booking-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-8px);
+}
+
+.booking-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.booking-card h3 {
+  padding: 15px 20px 10px;
+  color: #0f172a;
+}
+
+.booking-card p {
+  padding: 0 20px;
+  margin-bottom: 10px;
+  color: #475569;
+}
+
+.confirmed {
+  display: inline-block;
+  margin: 15px 20px 20px;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 8px 14px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* FAVORITES */
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.favorite-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.favorite-card:hover {
+  transform: translateY(-8px);
+}
+
+.favorite-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.favorite-card h3 {
+  padding: 15px 20px 10px;
+  color: #0f172a;
+}
+
+.favorite-card p {
+  padding: 0 20px 20px;
+  color: #64748b;
+}
+
+/* EMPTY STATE */
+
+.Profile-section > p {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  color: #64748b;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-Profile {
+    padding: 20px;
+  }
+
+  .booking-grid,
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-info h1 {
+    font-size: 1.6rem;
+  }
+
+  .profile-avatar {
+    font-size: 5rem;
+  }
+}
