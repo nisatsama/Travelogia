@@ -145,25 +145,22 @@ Travelogia/
 
 ## 📸 Screenshots
 
-<h3>Home Page</h3>
+### Home Page
 
-<img src="./public/Home1.png" width 800>
-<img src="./public/Home2.png" width 800>
+<img src="public/Home1.png" width="800">
+<img src="public/Home2.png" width="800">
 
-<h3>Destinations Page</h3>
+### Destinations Page
 
-<img src="./public/Destinations.png" width 800>
+<img src="public/Destinations.png" width="800">
 
-<h3>Booking Page</h3>
+### Booking Page
 
-<img src="./public/Booking.png" width 800>
+<img src="public/Booking.png" width="800">
 
-<h3>User Dashboard</h3>
+### User Dashboard
 
-<img src="./public/Profile.png" width 800>
-
-
-
+<img src="public/Profile.png" width="800">
 ## ⚙️ Installation
 
 ### Clone Repository
