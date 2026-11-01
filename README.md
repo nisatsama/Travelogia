@@ -166,7 +166,7 @@ Travelogia/
 ### Clone Repository
 
 
-git clone https://github.com/yourusername/Travelogia.git
+git clone https://github.com/nisatsama/Travelogia.git
 cd Travelogia
 
 
