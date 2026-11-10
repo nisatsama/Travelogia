@@ -258,3 +258,7 @@ If you found this project useful, consider giving it a star on GitHub.
 
 ---
 Build with ❤️ by Nisat Sama.
+## Contributors
+
+- Project Owner: Nisat Sama
+- Collaborator: CODERSARENA2
