@@ -238,26 +238,6 @@ Through this project, I gained hands-on experience with:
 
 ---
 
-## 👩‍💻 Author
-
-Nisat Sama
-
-B.Tech Computer Science Engineering
-
-Aspiring Software Developer
-
-GitHub: https://github.com/nisatsama
-
-LinkedIn: http://linkedin.com/in/nisat-sama-aa02a53a3
-
----
-
-## ⭐ Support
-
-If you found this project useful, consider giving it a star on GitHub.
-
----
-Build with ❤️ by Nisat Sama.
 ## Contributors
 
 - Project Owner: Nisat Sama
