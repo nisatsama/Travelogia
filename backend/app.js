@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -11,6 +12,7 @@ const Booking = require("./model/Booking");
 const User = require("./model/User");
 const Travel = require("./model/travel");
 const Favorite = require("./model/Favourite");
+const mockDb = require("./mockDb");
 
 // MIDDLEWARE & ROUTES
 const auth = require("./middleware/auth");
@@ -19,31 +21,48 @@ const packageRoutes = require("./routes/packageRoutes");
 
 // CONFIG
 dotenv.config();
+mongoose.set("bufferCommands", false); // CRITICAL: fail fast, don't hang
+
+const isDbConnected = () => mongoose.connection.readyState === 1;
 
 // MIDDLEWARE SETUP
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://travelogia-8m7e.vercel.app"],
+    origin: true,
     credentials: true,
   }),
 );
 
-app.use("/packages", packageRoutes);
-
-// DATABASE CONNECTION
+// DATABASE CONNECTION (non-blocking, falls back to in-memory mockDb if offline)
 const MONGO_URL = process.env.MONGO_URL;
-mongoose
-  .connect(MONGO_URL)
-  .then(() => {
-    console.log("✅ Connected to DB");
-  })
-  .catch((err) => {
-    console.log("❌ Error connecting to DB", err);
-  });
+if (MONGO_URL) {
+  mongoose
+    .connect(MONGO_URL, { serverSelectionTimeoutMS: 3000 })
+    .then(() => {
+      console.log("✅ Connected to DB");
+    })
+    .catch((err) => {
+      console.warn(
+        "⚠️ MongoDB not connected — running with in-memory mock store:",
+        err.message,
+      );
+    });
+} else {
+  console.warn(
+    "⚠️ MONGO_URL not configured — running with in-memory mock store",
+  );
+}
 
-// HOME ROUTE
-app.get("/", (req, res) => {
+// ============================
+// API ROUTER (/api)
+// ============================
+const apiRouter = express.Router();
+
+apiRouter.use("/packages", packageRoutes);
+
+// HOME / HEALTH ROUTE
+apiRouter.get("/", (req, res) => {
   res.json({
     message: "Backend connected successfully 🚀",
   });
@@ -54,9 +73,31 @@ app.get("/", (req, res) => {
 // ============================
 
 // SIGNUP
-app.post("/signup", async (req, res) => {
+apiRouter.post("/signup", async (req, res) => {
   try {
     const { username, email, password, role = "user" } = req.body;
+
+    if (!isDbConnected()) {
+      const existingUser = mockDb.users.find((u) => u.email === email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = {
+        _id: mockDb.createId("user"),
+        username,
+        email,
+        password: hashedPassword,
+        role,
+        favourites: [],
+        memberSince: new Date().toISOString(),
+      };
+      mockDb.users.push(user);
+      return res.status(201).json({
+        message: "User created successfully",
+        role: user.role,
+      });
+    }
 
     // Check existing user
     const existingUser = await User.findOne({ email });
@@ -87,11 +128,17 @@ app.post("/signup", async (req, res) => {
 });
 
 // LOGIN
-app.post("/login", async (req, res) => {
+apiRouter.post("/login", async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
-    const user = await User.findOne({ email });
+    let user;
+    if (!isDbConnected()) {
+      user = mockDb.users.find((u) => u.email === email);
+    } else {
+      user = await User.findOne({ email });
+    }
+
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
@@ -135,8 +182,11 @@ app.post("/login", async (req, res) => {
 // ============================
 
 // GET ALL TRAVELS
-app.get("/travels", async (req, res) => {
+apiRouter.get("/travels", async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      return res.json(mockDb.travels);
+    }
     const allTravels = await Travel.find({});
     res.json(allTravels);
   } catch (err) {
@@ -146,8 +196,15 @@ app.get("/travels", async (req, res) => {
 });
 
 // GET SINGLE TRAVEL
-app.get("/travels/:id", async (req, res) => {
+apiRouter.get("/travels/:id", async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      const travel = mockDb.travels.find((t) => t._id === req.params.id);
+      if (!travel) {
+        return res.status(404).json({ message: "Travel not found" });
+      }
+      return res.json(travel);
+    }
     const travel = await Travel.findById(req.params.id);
     if (!travel) {
       return res.status(404).json({ message: "Travel not found" });
@@ -159,9 +216,8 @@ app.get("/travels/:id", async (req, res) => {
 });
 
 // CREATE TRAVEL PLACE (Logged in users only)
-app.post("/travels", auth, async (req, res) => {
+apiRouter.post("/travels", auth, async (req, res) => {
   try {
-    // Implement actual travel package creation logic here if needed
     res.status(200).json({
       message: "Authenticated user access granted",
     });
@@ -171,8 +227,16 @@ app.post("/travels", auth, async (req, res) => {
 });
 
 // DELETE TRAVEL PLACE (Admin only)
-app.delete("/travels/:id", auth, adminOnly, async (req, res) => {
+apiRouter.delete("/travels/:id", auth, adminOnly, async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      const idx = mockDb.travels.findIndex((t) => t._id === req.params.id);
+      if (idx === -1) {
+        return res.status(404).json({ message: "Travel not found" });
+      }
+      mockDb.travels.splice(idx, 1);
+      return res.status(200).json({ message: "Travel deleted successfully" });
+    }
     const deletedTravel = await Travel.findByIdAndDelete(req.params.id);
     if (!deletedTravel) {
       return res.status(404).json({ message: "Travel not found" });
@@ -188,11 +252,25 @@ app.delete("/travels/:id", auth, adminOnly, async (req, res) => {
 // ============================
 
 // ADD TO FAVORITES
-app.post("/favorites", auth, async (req, res) => {
+apiRouter.post("/favorites", auth, async (req, res) => {
   try {
     const { travelId } = req.body;
 
-    // Check if already in favorites to prevent duplicates
+    if (!isDbConnected()) {
+      const existing = mockDb.favorites.find(
+        (f) => f.user === req.user.id && f.travel === travelId,
+      );
+      if (existing) {
+        return res.status(400).json({ message: "Already in favorites" });
+      }
+      mockDb.favorites.push({
+        _id: mockDb.createId("fav"),
+        user: req.user.id,
+        travel: travelId,
+      });
+      return res.status(201).json({ message: "Added to favorites" });
+    }
+
     const existing = await Favorite.findOne({
       user: req.user.id,
       travel: travelId,
@@ -216,8 +294,17 @@ app.post("/favorites", auth, async (req, res) => {
 });
 
 // GET USER FAVORITES
-app.get("/favorites", auth, async (req, res) => {
+apiRouter.get("/favorites", auth, async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      const favorites = mockDb.favorites
+        .filter((f) => f.user === req.user.id)
+        .map((f) => ({
+          ...f,
+          travel: mockDb.travels.find((t) => t._id === f.travel) || null,
+        }));
+      return res.json(favorites);
+    }
     const favorites = await Favorite.find({ user: req.user.id }).populate(
       "travel",
     );
@@ -232,9 +319,8 @@ app.get("/favorites", auth, async (req, res) => {
 // ============================
 
 // CREATE BOOKING
-app.post("/bookings", auth, async (req, res) => {
+apiRouter.post("/bookings", auth, async (req, res) => {
   try {
-    // Safely supports both payloads variants you passed in your snippets
     const {
       travelId,
       travel,
@@ -246,6 +332,26 @@ app.post("/bookings", auth, async (req, res) => {
       date,
       travelDate,
     } = req.body;
+
+    if (!isDbConnected()) {
+      const booking = {
+        _id: mockDb.createId("booking"),
+        user: req.user.id,
+        travel: travelId || travel,
+        destination,
+        travelers: travelers || travellers,
+        duration,
+        totalCost,
+        date: date || travelDate,
+        createdAt: new Date().toISOString(),
+      };
+      mockDb.bookings.push(booking);
+      return res.status(201).json({
+        success: true,
+        message: "Booking confirmed",
+        booking,
+      });
+    }
 
     const booking = new Booking({
       user: req.user.id,
@@ -273,8 +379,17 @@ app.post("/bookings", auth, async (req, res) => {
 });
 
 // GET USER BOOKINGS
-app.get("/bookings", auth, async (req, res) => {
+apiRouter.get("/bookings", auth, async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      const bookings = mockDb.bookings
+        .filter((b) => b.user === req.user.id)
+        .map((b) => ({
+          ...b,
+          travel: mockDb.travels.find((t) => t._id === b.travel) || null,
+        }));
+      return res.json(bookings);
+    }
     const bookings = await Booking.find({ user: req.user.id }).populate(
       "travel",
     );
@@ -288,14 +403,44 @@ app.get("/bookings", auth, async (req, res) => {
 // USER Profile ROUTE
 // ============================
 
-app.get("/profile", auth, async (req, res) => {
+apiRouter.get("/profile", auth, async (req, res) => {
   try {
+    if (!isDbConnected()) {
+      const userDoc = mockDb.users.find((u) => u._id === req.user.id);
+      if (!userDoc) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { password, ...user } = userDoc;
+      const bookings = mockDb.bookings
+        .filter((b) => b.user === req.user.id)
+        .map((b) => ({
+          ...b,
+          travel: mockDb.travels.find((t) => t._id === b.travel) || null,
+        }));
+      const favorites = mockDb.favorites
+        .filter((f) => f.user === req.user.id)
+        .map((f) => ({
+          ...f,
+          travel: mockDb.travels.find((t) => t._id === f.travel) || null,
+        }));
+      return res.status(200).json({
+        user,
+        favorites,
+        bookings,
+        stats: {
+          packagesViewed: 12,
+          tripsBooked: bookings.length,
+          wishlistItems: favorites.length,
+          countriesVisited: 3,
+        },
+      });
+    }
+
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch live user bookings and favorites details
     const bookings = await Booking.find({ user: req.user.id }).populate(
       "travel",
     );
@@ -307,7 +452,6 @@ app.get("/profile", auth, async (req, res) => {
       user,
       favorites,
       bookings,
-      // Leaving your mock stats object here for your frontend logic
       stats: {
         packagesViewed: 12,
         tripsBooked: bookings.length,
@@ -316,20 +460,52 @@ app.get("/profile", auth, async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("PROFILE ERROR:");
-    console.error(error);
-
+    console.error("PROFILE ERROR:", error);
     res.status(500).json({
       message: error.message,
-      stack: error.stack,
     });
   }
+});
+
+app.use("/api", apiRouter);
+
+// Route-level Mongoose fallback error middleware
+app.use((err, req, res, next) => {
+  if (
+    err.name === "MongooseError" ||
+    err.name === "MongoNetworkError" ||
+    (err.message && err.message.includes("buffering timed out"))
+  ) {
+    console.warn("[AI Studio] Database offline — returning mock empty response");
+    if (req.method === "GET") {
+      return res.json(
+        req.path.endsWith("s") || req.path.endsWith("s/") ? [] : {},
+      );
+    }
+    return res
+      .status(503)
+      .json({ error: "Service temporarily unavailable (database offline)" });
+  }
+  next(err);
+});
+
+// ============================
+// SERVE FRONTEND BUILD (SPA)
+// ============================
+const frontendDist = path.join(__dirname, "../frontend/dist");
+app.use(express.static(frontendDist));
+
+app.use((req, res, next) => {
+  if (req.method === "GET" && !req.path.startsWith("/api")) {
+    return res.sendFile(path.join(frontendDist, "index.html"));
+  }
+  next();
 });
 
 // ============================
 // SERVER ENGINE
 // ============================
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+const PORT = Number(process.env.PORT) || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
 });

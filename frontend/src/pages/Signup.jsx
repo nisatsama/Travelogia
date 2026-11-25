@@ -42,7 +42,7 @@ const Signup = () => {
       };
 
       await axios.post(
-        "https://travelogia-nfpk.onrender.com/signup",
+        "/api/signup",
         submitData,
       );
 

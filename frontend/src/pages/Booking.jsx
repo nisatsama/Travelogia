@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import "./Booking.css";
 import axios from "axios";
-axios.get("/bookings");
 function Booking() {
   const location = useLocation();
   const travel = location.state?.travel;
@@ -35,7 +34,7 @@ function Booking() {
       };
 
       const res = await axios.post(
-        "https://travelogia-nfpk.onrender.com/bookings",
+        "/api/bookings",
         bookingData,
         {
           headers: {

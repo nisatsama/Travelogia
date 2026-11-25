@@ -9,7 +9,7 @@ function PackageCategory() {
 
   useEffect(() => {
     axios
-      .get(`https://travelogia-nfpk.onrender.com/packages/category/${category}`)
+      .get(`/api/packages/category/${category}`)
       .then((res) => setPackages(res.data));
   }, [category]);
 

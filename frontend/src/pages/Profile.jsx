@@ -30,7 +30,7 @@ const Profile = () => {
         }
 
         const res = await axios.get(
-          "https://travelogia-nfpk.onrender.com/profile",
+          "/api/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,

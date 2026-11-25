@@ -12,12 +12,12 @@ const Details = () => {
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get(`https://travelogia-nfpk.onrender.com/travels/${id}`)
+      .get(`/api/travels/${id}`)
       .then((res) => {
         setTravel(res.data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Failed to load travel details");
         setLoading(false);
       });
@@ -45,7 +45,7 @@ const Details = () => {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://travelogia-nfpk.onrender.com/favorites",
+        "/api/favorites",
         {
           travelId: travel._id,
         },

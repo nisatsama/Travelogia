@@ -30,7 +30,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        "https://travelogia-nfpk.onrender.com/login",
+        "/api/login",
         formData,
       );
 

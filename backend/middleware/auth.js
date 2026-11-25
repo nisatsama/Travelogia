@@ -14,7 +14,10 @@ const auth = (req, res, next) => {
       ? authHeader.split(" ")[1]
       : authHeader;
 
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "fallback_secret",
+    );
 
     req.user = verified;
 

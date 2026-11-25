@@ -1,31 +1,28 @@
 import "./Home.css";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 function Home() {
   const [search, setSearch] = useState("");
   const [destinations, setDestinations] = useState([]);
-  const [filteredDestinations, setFilteredDestinations] = useState([]);
-  useEffect(() => {
+
+  const filteredDestinations = useMemo(() => {
     if (!search.trim()) {
-      setFilteredDestinations([]);
-      return;
+      return [];
     }
 
-    const filtered = destinations.filter(
+    return destinations.filter(
       (item) =>
         item.country?.toLowerCase().includes(search.toLowerCase()) ||
         item.city?.toLowerCase().includes(search.toLowerCase()) ||
         item.location?.toLowerCase().includes(search.toLowerCase()) ||
         item.title?.toLowerCase().includes(search.toLowerCase()),
     );
-
-    setFilteredDestinations(filtered);
   }, [search, destinations]);
   useEffect(() => {
     axios
-      .get("https://travelogia-nfpk.onrender.com/travels")
+      .get("/api/travels")
       .then((res) => {
         setDestinations(res.data);
       })

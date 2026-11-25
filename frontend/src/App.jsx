@@ -13,13 +13,13 @@ import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import Booking from "./pages/Booking";
 function App() {
-  const [message, setMessage] = useState("");
+  const [, setMessage] = useState("");
   const [travels, setTravels] = useState([]);
 
   useEffect(() => {
     // Fetch message
     axios
-      .get("https://travelogia-nfpk.onrender.com/")
+      .get("/api/")
       .then((res) => {
         setMessage(res.data.message);
       })
@@ -29,7 +29,7 @@ function App() {
 
     // Fetch travel data
     axios
-      .get("https://travelogia-nfpk.onrender.com/travels")
+      .get("/api/travels")
       .then((res) => {
         setTravels(res.data);
       })
