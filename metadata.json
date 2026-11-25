@@ -1,5 +1,8 @@
 {
   "name": "Travelogia",
-  "description": "A full-stack travel exploration and booking web application for discovering destinations, saving favorites, and managing bookings.",
-  "requestFramePermissions": []
+  "description": "A full-stack travel exploration and booking web application for discovering destinations, saving favorites, managing bookings, interactive maps, and Travelogia AI assistance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

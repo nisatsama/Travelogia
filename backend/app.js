@@ -1,511 +1,167 @@
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
-const app = express();
-const mongoose = require("mongoose");
+const helmet = require("helmet");
 const cors = require("cors");
-const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
-// MODELS
-const Booking = require("./model/Booking");
-const User = require("./model/User");
-const Travel = require("./model/travel");
-const Favorite = require("./model/Favourite");
-const mockDb = require("./mockDb");
+const env = require("./config/env");
+const { isDbConnected } = require("./config/database");
+const { sanitizeRequest } = require("./middleware/validate");
+const csrfProtect = require("./middleware/csrf");
+const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
+const errorHandler = require("./middleware/errorHandler");
+const { validate } = require("./middleware/validate");
+const { validateSignup, validateLogin } = require("./validators/authValidator");
+const authController = require("./controllers/authController");
 
-// MIDDLEWARE & ROUTES
-const auth = require("./middleware/auth");
-const adminOnly = require("./middleware/admin");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const travelRoutes = require("./routes/travelRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
 const packageRoutes = require("./routes/packageRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const itineraryRoutes = require("./routes/itineraryRoutes");
+const budgetRoutes = require("./routes/budgetRoutes");
+const collabTripRoutes = require("./routes/collabTripRoutes");
+const {
+  routePlannerRouter,
+  readinessRouter,
+  hiddenGemsRouter,
+  compareRouter,
+  recommendationsRouter,
+} = require("./routes/intelligenceRoutes");
+const journalRoutes = require("./routes/journalRoutes");
+const packingRoutes = require("./routes/packingRoutes");
+const priceWatchRoutes = require("./routes/priceWatchRoutes");
 
-// CONFIG
-dotenv.config();
-mongoose.set("bufferCommands", false); // CRITICAL: fail fast, don't hang
+const app = express();
+app.set("trust proxy", 1);
 
-const isDbConnected = () => mongoose.connection.readyState === 1;
-
-// MIDDLEWARE SETUP
-app.use(express.json());
+// Security headers (preserve OSM map tiles, Unsplash images, fonts, and iframe preview)
 app.use(
-  cors({
-    origin: true,
-    credentials: true,
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    frameguard: false,
   }),
 );
 
-// DATABASE CONNECTION (non-blocking, falls back to in-memory mockDb if offline)
-const MONGO_URL = process.env.MONGO_URL;
-if (MONGO_URL) {
-  mongoose
-    .connect(MONGO_URL, { serverSelectionTimeoutMS: 3000 })
-    .then(() => {
-      console.log("✅ Connected to DB");
-    })
-    .catch((err) => {
-      console.warn(
-        "⚠️ MongoDB not connected — running with in-memory mock store:",
-        err.message,
-      );
-    });
-} else {
-  console.warn(
-    "⚠️ MONGO_URL not configured — running with in-memory mock store",
-  );
-}
+// Explicit CORS allowlist (never wildcard with credentials)
+const staticAllowedOrigins = new Set(
+  [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "https://travelogia-8m7e.vercel.app",
+    ...(env.FRONTEND_URL ? env.FRONTEND_URL.split(",").map((s) => s.trim()) : []),
+  ].filter(Boolean),
+);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (staticAllowedOrigins.has(origin)) return callback(null, true);
+      try {
+        const parsed = new URL(origin);
+        if (parsed.hostname.endsWith(".run.app") || parsed.hostname.endsWith(".vercel.app")) {
+          return callback(null, true);
+        }
+      } catch {
+        // reject malformed origin
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-Idempotency-Key"],
+  }),
+);
+
+// Request size limits & parsers
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: false, limit: "100kb" }));
+app.use(cookieParser());
+app.use(sanitizeRequest);
 
 // ============================
 // API ROUTER (/api)
 // ============================
 const apiRouter = express.Router();
+apiRouter.use(apiLimiter);
+apiRouter.use(csrfProtect);
 
-apiRouter.use("/packages", packageRoutes);
-
-// HOME / HEALTH ROUTE
 apiRouter.get("/", (req, res) => {
-  res.json({
-    message: "Backend connected successfully 🚀",
+  res.status(200).json({
+    success: true,
+    message: "Travelogia API connected successfully",
+    storage: isDbConnected() ? "mongodb" : "in-memory",
   });
 });
 
-// ============================
-// AUTH ROUTES (SIGNUP & LOGIN)
-// ============================
-
-// SIGNUP
-apiRouter.post("/signup", async (req, res) => {
-  try {
-    const { username, email, password, role = "user" } = req.body;
-
-    if (!isDbConnected()) {
-      const existingUser = mockDb.users.find((u) => u.email === email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = {
-        _id: mockDb.createId("user"),
-        username,
-        email,
-        password: hashedPassword,
-        role,
-        favourites: [],
-        memberSince: new Date().toISOString(),
-      };
-      mockDb.users.push(user);
-      return res.status(201).json({
-        message: "User created successfully",
-        role: user.role,
-      });
-    }
-
-    // Check existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const user = new User({
-      username,
-      email,
-      password: hashedPassword,
-      role,
-    });
-
-    await user.save();
-
-    res.status(201).json({
-      message: "User created successfully",
-      role: user.role,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+apiRouter.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: "ok",
+    database: isDbConnected() ? "connected" : "fallback-memory",
+  });
 });
 
-// LOGIN
-apiRouter.post("/login", async (req, res) => {
-  try {
-    const { email, password, role } = req.body;
+// Auth routes (/api/auth/* AND backward-compatible /api/signup, /api/login)
+apiRouter.use("/auth", authRoutes);
+apiRouter.post("/signup", authLimiter, validate(validateSignup), authController.signup);
+apiRouter.post("/login", authLimiter, validate(validateLogin), authController.login);
 
-    let user;
-    if (!isDbConnected()) {
-      user = mockDb.users.find((u) => u.email === email);
-    } else {
-      user = await User.findOne({ email });
-    }
+// Domain routes
+apiRouter.use("/profile", userRoutes);
+apiRouter.use("/travels", travelRoutes);
+apiRouter.use("/bookings", bookingRoutes);
+apiRouter.use("/favorites", favoriteRoutes);
+apiRouter.use("/packages", packageRoutes);
+apiRouter.use("/chatbot", chatbotRoutes);
+apiRouter.use("/admin", adminRoutes);
 
-    if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
+// Travelogia 2.0 intelligence & workspace routes
+apiRouter.use("/itineraries", itineraryRoutes);
+apiRouter.use("/budgets", budgetRoutes);
+apiRouter.use("/trips", collabTripRoutes);
+apiRouter.use("/routes", routePlannerRouter);
+apiRouter.use("/readiness", readinessRouter);
+apiRouter.use("/hidden-gems", hiddenGemsRouter);
+apiRouter.use("/compare", compareRouter);
+apiRouter.use("/recommendations", recommendationsRouter);
+apiRouter.use("/journals", journalRoutes);
+apiRouter.use("/packing", packingRoutes);
+apiRouter.use("/price-watch", priceWatchRoutes);
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
-
-    // Check selected role
-    if (role && user.role !== role) {
-      return res.status(403).json({
-        message: `This account is registered as ${user.role}, not ${role}`,
-      });
-    }
-
-    // Generate JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET || "fallback_secret",
-      { expiresIn: "7d" },
-    );
-
-    res.status(200).json({
-      token,
-      role: user.role,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ============================
-// TRAVEL ROUTES
-// ============================
-
-// GET ALL TRAVELS
-apiRouter.get("/travels", async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      return res.json(mockDb.travels);
-    }
-    const allTravels = await Travel.find({});
-    res.json(allTravels);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Error fetching data" });
-  }
-});
-
-// GET SINGLE TRAVEL
-apiRouter.get("/travels/:id", async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      const travel = mockDb.travels.find((t) => t._id === req.params.id);
-      if (!travel) {
-        return res.status(404).json({ message: "Travel not found" });
-      }
-      return res.json(travel);
-    }
-    const travel = await Travel.findById(req.params.id);
-    if (!travel) {
-      return res.status(404).json({ message: "Travel not found" });
-    }
-    res.json(travel);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching travel" });
-  }
-});
-
-// CREATE TRAVEL PLACE (Logged in users only)
-apiRouter.post("/travels", auth, async (req, res) => {
-  try {
-    res.status(200).json({
-      message: "Authenticated user access granted",
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// DELETE TRAVEL PLACE (Admin only)
-apiRouter.delete("/travels/:id", auth, adminOnly, async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      const idx = mockDb.travels.findIndex((t) => t._id === req.params.id);
-      if (idx === -1) {
-        return res.status(404).json({ message: "Travel not found" });
-      }
-      mockDb.travels.splice(idx, 1);
-      return res.status(200).json({ message: "Travel deleted successfully" });
-    }
-    const deletedTravel = await Travel.findByIdAndDelete(req.params.id);
-    if (!deletedTravel) {
-      return res.status(404).json({ message: "Travel not found" });
-    }
-    res.status(200).json({ message: "Travel deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// ============================
-// FAVORITES ROUTES
-// ============================
-
-// ADD TO FAVORITES
-apiRouter.post("/favorites", auth, async (req, res) => {
-  try {
-    const { travelId } = req.body;
-
-    if (!isDbConnected()) {
-      const existing = mockDb.favorites.find(
-        (f) => f.user === req.user.id && f.travel === travelId,
-      );
-      if (existing) {
-        return res.status(400).json({ message: "Already in favorites" });
-      }
-      mockDb.favorites.push({
-        _id: mockDb.createId("fav"),
-        user: req.user.id,
-        travel: travelId,
-      });
-      return res.status(201).json({ message: "Added to favorites" });
-    }
-
-    const existing = await Favorite.findOne({
-      user: req.user.id,
-      travel: travelId,
-    });
-
-    if (existing) {
-      return res.status(400).json({ message: "Already in favorites" });
-    }
-
-    const favorite = new Favorite({
-      user: req.user.id,
-      travel: travelId,
-    });
-
-    await favorite.save();
-
-    res.status(201).json({ message: "Added to favorites" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET USER FAVORITES
-apiRouter.get("/favorites", auth, async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      const favorites = mockDb.favorites
-        .filter((f) => f.user === req.user.id)
-        .map((f) => ({
-          ...f,
-          travel: mockDb.travels.find((t) => t._id === f.travel) || null,
-        }));
-      return res.json(favorites);
-    }
-    const favorites = await Favorite.find({ user: req.user.id }).populate(
-      "travel",
-    );
-    res.json(favorites);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// ============================
-// BOOKINGS ROUTES
-// ============================
-
-// CREATE BOOKING
-apiRouter.post("/bookings", auth, async (req, res) => {
-  try {
-    const {
-      travelId,
-      travel,
-      destination,
-      travelers,
-      travellers,
-      duration,
-      totalCost,
-      date,
-      travelDate,
-    } = req.body;
-
-    if (!isDbConnected()) {
-      const booking = {
-        _id: mockDb.createId("booking"),
-        user: req.user.id,
-        travel: travelId || travel,
-        destination,
-        travelers: travelers || travellers,
-        duration,
-        totalCost,
-        date: date || travelDate,
-        createdAt: new Date().toISOString(),
-      };
-      mockDb.bookings.push(booking);
-      return res.status(201).json({
-        success: true,
-        message: "Booking confirmed",
-        booking,
-      });
-    }
-
-    const booking = new Booking({
-      user: req.user.id,
-      travel: travelId || travel,
-      destination,
-      travelers: travelers || travellers,
-      duration,
-      totalCost,
-      date: date || travelDate,
-    });
-
-    await booking.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Booking confirmed",
-      booking,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
-
-// GET USER BOOKINGS
-apiRouter.get("/bookings", auth, async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      const bookings = mockDb.bookings
-        .filter((b) => b.user === req.user.id)
-        .map((b) => ({
-          ...b,
-          travel: mockDb.travels.find((t) => t._id === b.travel) || null,
-        }));
-      return res.json(bookings);
-    }
-    const bookings = await Booking.find({ user: req.user.id }).populate(
-      "travel",
-    );
-    res.json(bookings);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// ============================
-// USER Profile ROUTE
-// ============================
-
-apiRouter.get("/profile", auth, async (req, res) => {
-  try {
-    if (!isDbConnected()) {
-      const userDoc = mockDb.users.find((u) => u._id === req.user.id);
-      if (!userDoc) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      const { password, ...user } = userDoc;
-      const bookings = mockDb.bookings
-        .filter((b) => b.user === req.user.id)
-        .map((b) => ({
-          ...b,
-          travel: mockDb.travels.find((t) => t._id === b.travel) || null,
-        }));
-      const favorites = mockDb.favorites
-        .filter((f) => f.user === req.user.id)
-        .map((f) => ({
-          ...f,
-          travel: mockDb.travels.find((t) => t._id === f.travel) || null,
-        }));
-      return res.status(200).json({
-        user,
-        favorites,
-        bookings,
-        stats: {
-          packagesViewed: 12,
-          tripsBooked: bookings.length,
-          wishlistItems: favorites.length,
-          countriesVisited: 3,
-        },
-      });
-    }
-
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const bookings = await Booking.find({ user: req.user.id }).populate(
-      "travel",
-    );
-    const favorites = await Favorite.find({ user: req.user.id }).populate(
-      "travel",
-    );
-
-    res.status(200).json({
-      user,
-      favorites,
-      bookings,
-      stats: {
-        packagesViewed: 12,
-        tripsBooked: bookings.length,
-        wishlistItems: favorites.length,
-        countriesVisited: 3,
-      },
-    });
-  } catch (error) {
-    console.error("PROFILE ERROR:", error);
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+// 404 for unknown API paths
+apiRouter.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API route not found: ${req.method} ${req.originalUrl}`,
+  });
 });
 
 app.use("/api", apiRouter);
-
-// Route-level Mongoose fallback error middleware
-app.use((err, req, res, next) => {
-  if (
-    err.name === "MongooseError" ||
-    err.name === "MongoNetworkError" ||
-    (err.message && err.message.includes("buffering timed out"))
-  ) {
-    console.warn("[AI Studio] Database offline — returning mock empty response");
-    if (req.method === "GET") {
-      return res.json(
-        req.path.endsWith("s") || req.path.endsWith("s/") ? [] : {},
-      );
-    }
-    return res
-      .status(503)
-      .json({ error: "Service temporarily unavailable (database offline)" });
-  }
-  next(err);
-});
 
 // ============================
 // SERVE FRONTEND BUILD (SPA)
 // ============================
 const frontendDist = path.join(__dirname, "../frontend/dist");
-app.use(express.static(frontendDist));
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/api")) {
+      return res.sendFile(path.join(frontendDist, "index.html"));
+    }
+    return next();
+  });
+}
 
-app.use((req, res, next) => {
-  if (req.method === "GET" && !req.path.startsWith("/api")) {
-    return res.sendFile(path.join(frontendDist, "index.html"));
-  }
-  next();
-});
+// Centralized safe error handler
+app.use(errorHandler);
 
-// ============================
-// SERVER ENGINE
-// ============================
-const PORT = Number(process.env.PORT) || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
-});
+module.exports = app;

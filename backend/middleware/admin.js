@@ -1,10 +1,13 @@
-const adminOnly = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({
-      message: "Access denied",
-    });
-  }
+const ApiError = require("../utils/ApiError");
 
-  next();
+const adminOnly = (req, res, next) => {
+  if (!req.user) {
+    return next(new ApiError(401, "Authentication required."));
+  }
+  if (req.user.role !== "admin") {
+    return next(new ApiError(403, "Administrator privileges required."));
+  }
+  return next();
 };
+
 module.exports = adminOnly;

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./Signup.css"; // Importing the separate signup CSS file
+import { useNavigate, Link } from "react-router-dom";
+import { getErrorMessage } from "../api/client";
+import { useAuth } from "../context/AuthContext";
+import "./Signup.css";
 
 const Signup = () => {
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -16,17 +18,25 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Front-end validation check matching passwords
+    if (formData.username.trim().length < 2) {
+      return setError("Username must be at least 2 characters.");
+    }
+    if (formData.password.length < 8) {
+      return setError("Password must be at least 8 characters long.");
+    }
+    if (!/[A-Za-z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      return setError("Password must include at least one letter and one number.");
+    }
     if (formData.password !== formData.confirmPassword) {
       return setError("Passwords do not match.");
     }
@@ -34,25 +44,18 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // Structure matches your Mongoose backend userSchema expectation
-      const submitData = {
-        username: formData.username,
-        email: formData.email,
+      await signup({
+        username: formData.username.trim(),
+        email: formData.email.trim(),
         password: formData.password,
-      };
+      });
 
-      await axios.post(
-        "/api/signup",
-        submitData,
-      );
-
-      // Redirect directly to login upon successful registration
-      navigate("/login");
+      navigate("/login", {
+        state: { message: "Account created! Please sign in to continue." },
+      });
     } catch (err) {
-      console.error(err);
       setError(
-        err.response?.data?.message ||
-          "Registration failed. Email might already exist.",
+        getErrorMessage(err, "Registration failed. Email might already exist."),
       );
     } finally {
       setLoading(false);
@@ -69,7 +72,7 @@ const Signup = () => {
       <div className="signup-card">
         <div className="signup-header">
           <h2>Create Account</h2>
-          <p>Join us by signing up for a new account below</p>
+          <p>Join Travelogia by signing up for a new account below</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -84,6 +87,7 @@ const Signup = () => {
               placeholder="johndoe"
               value={formData.username}
               onChange={handleChange}
+              autoComplete="name"
               required
             />
           </div>
@@ -97,12 +101,13 @@ const Signup = () => {
               placeholder="name@example.com"
               value={formData.email}
               onChange={handleChange}
+              autoComplete="email"
               required
             />
           </div>
 
           <div className="input-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password (8+ chars, letter &amp; number)</label>
             <input
               type="password"
               id="password"
@@ -110,6 +115,8 @@ const Signup = () => {
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="new-password"
+              minLength={8}
               required
             />
           </div>
@@ -123,6 +130,8 @@ const Signup = () => {
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
+              autoComplete="new-password"
+              minLength={8}
               required
             />
           </div>
@@ -135,9 +144,14 @@ const Signup = () => {
         <div className="signup-footer">
           <p>
             Already have an account?{" "}
-            <span className="login-link" onClick={() => navigate("/login")}>
+            <Link className="login-link" to="/login">
               Sign In
-            </span>
+            </Link>
+          </p>
+          <p style={{ marginTop: "8px" }}>
+            <Link className="login-link" to="/">
+              ← Back to Home
+            </Link>
           </p>
         </div>
       </div>

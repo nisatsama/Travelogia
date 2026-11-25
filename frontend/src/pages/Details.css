@@ -357,3 +357,40 @@
     padding: 30px 20px;
   }
 }
+
+.details-est-note {
+  font-size: 0.78rem;
+  color: #ecd399;
+  font-weight: 500;
+}
+
+.details-sub-meta {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.details-fav-active {
+  border-color: #ecd399;
+  color: #ecd399;
+  background: rgba(236, 211, 153, 0.14);
+}
+
+.details-tips-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+}
+
+.details-tips-list li {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+

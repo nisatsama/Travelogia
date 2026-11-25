@@ -1,0 +1,1112 @@
+# TRAVELOGIA 2.0 — AUTONOMOUS FULL-STACK DEVELOPMENT MASTER PROMPT
+
+## ROLE
+
+Act as a Senior Software Architect, Senior MERN Stack Engineer, AI Engineer, Database Architect, Security Engineer, and UI/UX Preservation Specialist.
+
+You are responsible for upgrading my existing project, **Travelogia**, into a feature-rich, production-oriented travel planning and booking platform.
+
+You must work directly on the existing repository, understand its implementation, and extend it rather than replacing it with an unrelated application.
+
+## PROJECT DETAILS
+
+**GitHub Repository:** https://github.com/nisatsama/Travelogia
+
+**Frontend:** https://travelogia-8m7e.vercel.app/
+
+**Backend:** https://travelogia-nfpk.onrender.com/
+
+**Existing technology stack:**
+- React
+- Vite
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT authentication
+- Axios
+
+Additional technologies may be introduced when genuinely required.
+
+---
+
+# 1. PRIMARY MISSION
+
+Implement all 12 advanced features listed below.
+
+The objective is to transform Travelogia from a conventional travel booking application into an intelligent, collaborative, personalized travel ecosystem.
+
+The application must support:
+
+1. AI-powered Smart Trip Builder.
+2. Intelligent Budget Optimizer.
+3. Collaborative Trip Planning.
+4. Route Intelligence and Multi-Destination Optimizer.
+5. Travel Readiness and Risk Intelligence.
+6. Hidden Gems Discovery Engine.
+7. Smart Destination Comparison.
+8. Personalized Travel Recommendation Engine.
+9. Travel Memory Journal.
+10. Smart Packing Assistant.
+11. Travel Deal and Price Watcher.
+12. Accessibility-Aware Travel Discovery.
+
+These are mandatory project requirements, not optional suggestions.
+
+Implement them as actual working application features with database persistence, backend APIs, frontend integration, validation, and appropriate error handling.
+
+Do not implement decorative interfaces that do not perform their advertised functionality.
+
+---
+
+# 2. CRITICAL REQUIREMENT: PRESERVE THE EXISTING UI
+
+The existing Travelogia interface must remain recognizable.
+
+Do not redesign the application from scratch.
+
+Preserve:
+- Existing color palette.
+- Typography.
+- Navigation.
+- Header and footer.
+- Destination cards.
+- Existing page layouts.
+- Buttons and interaction styles.
+- Animations.
+- Spacing and visual identity.
+- Existing responsive behavior.
+
+New features must use the existing design language.
+
+You may add:
+- New pages.
+- New sections.
+- New navigation links.
+- Modals.
+- Tabs.
+- Drawers.
+- Interactive dashboards.
+- Floating panels.
+- Additional cards and components.
+
+However, these must visually integrate with the current application.
+
+Do not replace the existing design with generic admin dashboards or boilerplate templates.
+
+Before implementation, inspect the existing frontend and identify reusable components and styling conventions.
+
+---
+
+# 3. MANDATORY REPOSITORY AND GIT WORKFLOW
+
+You must work directly on the GitHub repository if repository integration is available.
+
+## Branch policy
+
+The target branch is:
+
+`main`
+
+I explicitly authorize committing completed milestones directly to `main`.
+
+Do not create a separate feature branch unless direct commits to main are technically impossible or blocked by repository permissions.
+
+## Before making changes
+
+1. Inspect the repository.
+2. Inspect the current Git branch.
+3. Check the latest commit.
+4. Check the working tree for uncommitted changes.
+5. Preserve existing work.
+6. Never overwrite unrelated changes.
+7. Never force-push.
+8. Never delete existing branches.
+9. Never reset or rewrite Git history.
+10. Never commit environment files or credentials.
+
+If there are existing uncommitted changes, inspect them and preserve them.
+
+## Mandatory milestone commits
+
+You must commit after every completed milestone.
+
+Use meaningful commit messages.
+
+Suggested commit sequence:
+
+**Milestone 0**
+`chore: prepare Travelogia 2.0 foundation`
+
+**Milestone 1**
+`feat: implement smart AI trip builder`
+
+**Milestone 2**
+`feat: add intelligent travel budget optimizer`
+
+**Milestone 3**
+`feat: implement collaborative trip planning`
+
+**Milestone 4**
+`feat: add multi-destination route intelligence`
+
+**Milestone 5**
+`feat: integrate travel readiness and risk intelligence`
+
+**Milestone 6**
+`feat: implement hidden gems discovery engine`
+
+**Milestone 7**
+`feat: add destination comparison system`
+
+**Milestone 8**
+`feat: implement personalized recommendation engine`
+
+**Milestone 9**
+`feat: add travel memory journal`
+
+**Milestone 10**
+`feat: implement smart packing assistant`
+
+**Milestone 11**
+`feat: add destination price tracking and alerts`
+
+**Milestone 12**
+`feat: implement accessibility-aware destination discovery`
+
+**Final milestone**
+`chore: finalize Travelogia 2.0 integration and documentation`
+
+You may split a milestone into smaller commits if needed.
+
+After each milestone:
+
+1. Run relevant tests.
+2. Run frontend production build.
+3. Fix errors introduced by your changes.
+4. Inspect the Git diff.
+5. Commit the completed work.
+6. Push the commit to `origin/main` if GitHub access permits.
+7. Confirm the resulting commit SHA.
+
+Do not report a commit or push as successful unless the operation actually succeeded.
+
+Do not create empty commits.
+
+If a milestone cannot be fully completed, commit only a coherent, tested, working portion and clearly document what remains. Never leave the repository in a broken state merely to reach the next milestone.
+
+---
+
+# 4. FEATURE 1 — AI-POWERED SMART TRIP BUILDER
+
+Build an intelligent trip-planning system powered by Gemini.
+
+## User inputs
+
+- Starting city.
+- Destination preferences.
+- Travel dates.
+- Number of days.
+- Number of travellers.
+- Total budget.
+- Travel style.
+- Interests.
+- Preferred activities.
+- Accommodation preference.
+
+Travel styles:
+- Budget.
+- Adventure.
+- Luxury.
+- Relaxation.
+- Cultural.
+- Family.
+- Romantic.
+- Solo.
+
+## Expected output
+
+Generate a structured itinerary containing:
+
+- Day-wise travel plans.
+- Destinations.
+- Activities.
+- Suggested attractions.
+- Estimated expenses.
+- Travel duration.
+- Suggested accommodation areas.
+- Food recommendations.
+- Alternative activities.
+- Travel tips.
+
+## Important implementation rules
+
+- Use Gemini through a backend service.
+- Keep the Gemini API key server-side.
+- Use structured JSON responses where supported.
+- Validate generated destination IDs against MongoDB.
+- Do not accept arbitrary AI-generated prices as verified prices.
+- Calculate budgets through backend business logic.
+- Allow users to edit and save itineraries.
+- Persist generated trips in MongoDB.
+- Allow users to regenerate individual days.
+
+Suggested collection: `Itinerary`.
+
+---
+
+# 5. FEATURE 2 — INTELLIGENT BUDGET OPTIMIZER
+
+Build a comprehensive travel expense planning engine.
+
+## Inputs
+
+- Total budget.
+- Number of travellers.
+- Travel duration.
+- Selected destinations.
+- Accommodation preferences.
+- Transport preferences.
+- Activities.
+
+## Expense categories
+
+- Transportation.
+- Accommodation.
+- Food.
+- Activities.
+- Local transport.
+- Miscellaneous.
+- Emergency reserve.
+
+## Required functionality
+
+- Automatically allocate the budget.
+- Calculate per-person expenses.
+- Calculate group expenses.
+- Show estimated category-wise spending.
+- Warn users when their budget is exceeded.
+- Suggest cheaper alternatives.
+- Compare multiple itinerary budgets.
+- Allow manual expense adjustments.
+- Save budgets.
+- Track actual versus estimated expenses.
+
+## Advanced functionality
+
+If an itinerary exceeds the budget, automatically suggest modifications.
+
+Example:
+
+User budget: ₹15,000.
+
+Estimated itinerary: ₹18,500.
+
+The optimizer should identify where costs can be reduced and generate a revised itinerary targeting ₹15,000.
+
+Do not claim that estimated costs are live market prices.
+
+---
+
+# 6. FEATURE 3 — COLLABORATIVE TRIP PLANNING
+
+Implement group-based trip planning.
+
+Use Socket.IO for real-time collaboration where appropriate.
+
+## Features
+
+- Create a private trip workspace.
+- Invite friends.
+- Generate invitation links or codes.
+- Join a shared trip.
+- Add destinations.
+- Remove destinations.
+- Vote on destinations.
+- Vote on activities.
+- Edit shared itineraries.
+- Assign responsibilities.
+- Add comments.
+- Split expenses.
+- View group members.
+
+## Technical requirements
+
+Implement:
+- Trip ownership.
+- Membership permissions.
+- Role-based access.
+- Real-time event synchronization.
+- Persistent collaboration data.
+- Authorization on every collaborative endpoint.
+
+Suggested roles:
+- Owner.
+- Editor.
+- Viewer.
+
+Prevent users outside the group from accessing private trips.
+
+Handle concurrent updates safely.
+
+---
+
+# 7. FEATURE 4 — ROUTE INTELLIGENCE AND MULTI-DESTINATION OPTIMIZER
+
+Implement intelligent route planning.
+
+Use:
+- Leaflet.
+- OpenStreetMap.
+- Appropriate routing/geocoding services.
+- Geospatial calculations.
+- Graph algorithms.
+
+## Functionality
+
+Users should be able to select multiple destinations and generate an optimized route.
+
+Example:
+
+Kolkata → Darjeeling → Gangtok → Kalimpong → Kolkata.
+
+Implement:
+
+- Interactive route visualization.
+- Destination markers.
+- Distance calculations.
+- Estimated travel time where reliable data is available.
+- Destination ordering.
+- Route alternatives.
+- Reordering destinations.
+- Approximate travel cost.
+- Route summary.
+
+Implement an initial route optimizer using a suitable heuristic such as nearest-neighbour or 2-opt.
+
+Clearly label approximate straight-line distances separately from road distances.
+
+Do not invent actual transport schedules.
+
+Provide external directions links.
+
+---
+
+# 8. FEATURE 5 — TRAVEL READINESS AND RISK INTELLIGENCE
+
+Build a travel information dashboard for selected destinations.
+
+Display available information about:
+
+- Weather.
+- Seasonal conditions.
+- Travel advisories.
+- Road accessibility.
+- Permit requirements.
+- Emergency contacts.
+- Local travel considerations.
+- Recommended preparation.
+
+Integrate legitimate external data providers where available.
+
+Do not fabricate weather, road conditions, advisories, or permits.
+
+Show:
+- Source.
+- Last updated timestamp.
+- Information reliability.
+- Estimated versus verified information.
+
+Implement fallback behavior if an external provider is unavailable.
+
+Add a Travel Readiness Score using transparent backend rules.
+
+---
+
+# 9. FEATURE 6 — HIDDEN GEMS DISCOVERY ENGINE
+
+Create a dedicated section named:
+
+**Beyond the Tourist Trail**
+
+Recommend lesser-known destinations based on:
+
+- User interests.
+- Budget.
+- Starting location.
+- Preferred distance.
+- Trip duration.
+- Category.
+- Travel season.
+- Preferred crowd level.
+
+Include destinations from India and international locations.
+
+Prioritize discovering less commonly featured destinations in Northeast India, North Bengal, and other regions.
+
+## Functionality
+
+- Discover hidden destinations.
+- Filter by interests.
+- Filter by budget.
+- Show location on map.
+- View travel information.
+- Save favorites.
+- Generate AI travel suggestions.
+
+Do not fabricate popularity, visitor counts, or crowd statistics.
+
+If crowd-level data is unavailable, treat it as a user preference rather than a factual destination attribute.
+
+---
+
+# 10. FEATURE 7 — SMART DESTINATION COMPARISON
+
+Allow users to compare up to three destinations simultaneously.
+
+## Comparison fields
+
+- Estimated budget.
+- Country.
+- Region.
+- Best time to visit.
+- Categories.
+- Activities.
+- Accommodation estimates.
+- Travel duration.
+- Distance from starting city.
+- Available amenities.
+- Accessibility information.
+- Weather information where available.
+
+## Requirements
+
+- Side-by-side comparison.
+- Highlight advantages.
+- Display meaningful differences.
+- Save comparisons if appropriate.
+- Generate an AI-assisted comparison summary.
+
+AI-generated comparisons must use actual destination data as context.
+
+Do not invent prices, ratings, or availability.
+
+---
+
+# 11. FEATURE 8 — PERSONALIZED TRAVEL RECOMMENDATION ENGINE
+
+Build a recommendation system based on user preferences and activity.
+
+Use:
+- Viewed destinations.
+- Favorite destinations.
+- Previous bookings.
+- Preferred categories.
+- Budget preferences.
+- Travel duration preferences.
+- Selected interests.
+
+Implement an initial weighted scoring algorithm.
+
+Example:
+
+Recommendation Score =
+- Interest Match: 30%
+- Budget Compatibility: 25%
+- Category Match: 20%
+- Seasonal Suitability: 15%
+- Travel Duration Match: 10%
+
+The weights must be configurable.
+
+## Features
+
+- Recommended destinations.
+- Similar destinations.
+- Personalized homepage section.
+- Trending destinations where actual interaction data supports the ranking.
+- Explanations for recommendations.
+- Ability to reset personalization.
+
+Do not claim that the algorithm uses machine learning if it is a rule-based ranking system.
+
+Do not infer sensitive personal characteristics.
+
+Allow users to control personalization.
+
+---
+
+# 12. FEATURE 9 — TRAVEL MEMORY JOURNAL
+
+Create a personal travel journal.
+
+Users should be able to document their trips.
+
+## Features
+
+- Create journal entries.
+- Upload photographs.
+- Add titles.
+- Write descriptions.
+- Add visited locations.
+- Attach dates.
+- Create timelines.
+- Add tags.
+- Rate experiences.
+- Edit and delete entries.
+- Share selected stories publicly.
+
+## Technical requirements
+
+- Use a legitimate image-storage provider.
+- Validate image types and sizes.
+- Protect uploaded content.
+- Implement authorization.
+- Support private and public entries.
+- Avoid exposing private user content.
+
+Add a visually appealing journal page using the existing Travelogia design.
+
+---
+
+# 13. FEATURE 10 — SMART PACKING ASSISTANT
+
+Build a destination-aware packing assistant.
+
+## Inputs
+
+- Destination.
+- Duration.
+- Travel season.
+- Weather data where available.
+- Activities.
+- Traveller type.
+
+## Output
+
+Generate categorized packing suggestions:
+
+- Clothing.
+- Toiletries.
+- Documents.
+- Electronics.
+- Medicines and personal essentials.
+- Activity-specific items.
+- Optional items.
+
+## Features
+
+- Generate checklist.
+- Mark items complete.
+- Add custom items.
+- Remove items.
+- Save checklist.
+- Reuse previous templates.
+- Generate AI suggestions.
+
+Persist checklists in MongoDB.
+
+Do not present AI-generated medical advice as professional guidance.
+
+---
+
+# 14. FEATURE 11 — TRAVEL DEAL AND PRICE WATCHER
+
+Build a price observation and notification system.
+
+Users should be able to:
+
+- Select a destination.
+- Set a target budget.
+- Save price observations.
+- Track changes over time.
+- View historical price graphs.
+- Receive notifications when tracked estimates cross their configured threshold.
+
+Implement:
+- Price history collection.
+- Scheduled background jobs.
+- Alert rules.
+- Notification records.
+- User preferences.
+
+Only track real prices when a legitimate external provider supplies them.
+
+If no live booking or pricing API is available, implement clearly labelled destination price estimates and historical observations from configured data.
+
+Never fabricate live airline, hotel, or transport prices.
+
+Never describe an estimate as a confirmed deal.
+
+---
+
+# 15. FEATURE 12 — ACCESSIBILITY-AWARE TRAVEL DISCOVERY
+
+Add accessibility information to destination discovery.
+
+## Filters
+
+- Wheelchair accessibility.
+- Accessible accommodation.
+- Public transport availability.
+- Walking intensity.
+- Family-friendly facilities.
+- Accessible attractions.
+- Accessibility-related amenities.
+
+## Features
+
+- Accessibility filters.
+- Destination accessibility profiles.
+- Accessibility information on destination detail pages.
+- Comparison of accessibility attributes.
+- Accessible travel recommendations.
+
+Use verified sources or clearly labelled user-submitted information.
+
+Do not assume that an unknown accessibility attribute means accessible.
+
+Support three states where appropriate:
+- Yes.
+- No.
+- Unknown.
+
+---
+
+# 16. EXPAND THE DESTINATION DATABASE
+
+Add a substantial destination catalogue.
+
+Target: at least 60–100 destination records.
+
+Prioritize:
+- India.
+- Northeast India.
+- North Bengal.
+- Popular international destinations.
+- Lesser-known destinations.
+
+Each record should support:
+
+- Name.
+- Slug.
+- Country.
+- State/region.
+- City.
+- Description.
+- Coordinates.
+- Address.
+- Images.
+- Image gallery.
+- Categories.
+- Estimated pricing.
+- Best time to visit.
+- Suggested duration.
+- Activities.
+- Highlights.
+- Amenities.
+- Travel tips.
+- Accessibility information.
+- Featured status.
+
+Create an idempotent seed script.
+
+Do not duplicate existing destination records.
+
+Do not overwrite user-generated content.
+
+Clearly label estimated values and avoid fabricated reviews.
+
+---
+
+# 17. MAPS INTEGRATION
+
+Use Leaflet and OpenStreetMap for map visualization.
+
+Integrate maps into:
+- Destination detail pages.
+- Destination discovery.
+- Smart trip itineraries.
+- Collaborative trips.
+- Multi-destination route planning.
+- Travel journal entries.
+
+Requirements:
+- Markers.
+- Popups.
+- Route visualization.
+- Zoom and pan.
+- Responsive behavior.
+- Directions links.
+- Missing-coordinate handling.
+
+Do not request precise user location automatically.
+
+Only request browser geolocation after an explicit user action.
+
+---
+
+# 18. GEMINI AI ARCHITECTURE
+
+Use Gemini for:
+- Trip generation.
+- Budget suggestions.
+- Destination recommendations.
+- Destination comparisons.
+- Hidden gems suggestions.
+- Packing lists.
+- Travel tips.
+
+Implement a reusable backend Gemini service.
+
+Suggested structure:
+
+backend/services/geminiService.js
+
+Requirements:
+
+- Use the official Google Gen AI SDK.
+- Keep API keys server-side.
+- Configure `GEMINI_API_KEY`.
+- Configure `GEMINI_MODEL`.
+- Verify model and SDK compatibility.
+- Validate user requests.
+- Handle rate limits.
+- Handle timeouts.
+- Handle API errors.
+- Limit prompt size.
+- Limit conversation history.
+- Avoid unnecessary personal data.
+- Validate generated JSON.
+- Use database context where relevant.
+
+AI should never be the source of truth for:
+- Booking prices.
+- Booking permissions.
+- Payments.
+- Inventory.
+- Verified weather.
+- Real-time availability.
+
+Backend business logic must validate critical data independently.
+
+---
+
+# 19. BACKEND AND DATABASE ENGINEERING
+
+Refactor existing backend logic into maintainable modules.
+
+Use suitable:
+- Controllers.
+- Services.
+- Routes.
+- Middleware.
+- Models.
+- Validators.
+- Utilities.
+
+Create database models for the new functionality.
+
+Potential collections:
+
+- Itineraries.
+- Budgets.
+- Trips.
+- TripMembers.
+- TripVotes.
+- TripComments.
+- TripExpenses.
+- TravelJournals.
+- PackingLists.
+- PriceObservations.
+- PriceAlerts.
+- Notifications.
+- UserPreferences.
+
+Avoid unnecessary collections if existing schemas can reasonably support the same functionality.
+
+Add:
+- Appropriate indexes.
+- Pagination.
+- Validation.
+- Authorization.
+- Centralized errors.
+- Safe database operations.
+
+Preserve compatibility with existing APIs.
+
+Do not break existing authentication, booking, favorite, profile, or destination functionality.
+
+---
+
+# 20. SECURITY AND DATA INTEGRITY
+
+Review and fix the existing critical vulnerabilities.
+
+Mandatory:
+
+- Prevent public signup from assigning admin privileges.
+- Remove fallback JWT secrets.
+- Never trust client-submitted booking prices.
+- Validate all input.
+- Implement authentication and authorization.
+- Add rate limiting.
+- Restrict CORS.
+- Secure cookies where used.
+- Protect admin operations.
+- Prevent unauthorized access to private trips and journals.
+- Prevent unauthorized file uploads.
+- Avoid exposing stack traces.
+- Prevent mass assignment.
+- Prevent insecure ObjectId access.
+- Keep Gemini credentials server-side.
+
+Use environment variables.
+
+Never commit `.env` files.
+
+---
+
+# 21. FRONTEND ENGINEERING
+
+Create reusable components that follow the current Travelogia styling.
+
+Suggested reusable components:
+
+- TripBuilder.
+- BudgetBreakdown.
+- BudgetWarning.
+- CollaborativeWorkspace.
+- TripMemberList.
+- VotingPanel.
+- RouteMap.
+- TravelReadinessCard.
+- HiddenGemCard.
+- DestinationComparison.
+- RecommendationSection.
+- JournalEditor.
+- PackingChecklist.
+- PriceHistoryChart.
+- AccessibilityFilter.
+- NotificationCenter.
+
+Implement:
+- Loading states.
+- Skeleton loaders.
+- Error states.
+- Empty states.
+- Success feedback.
+- Form validation.
+- Responsive layouts.
+- Accessible controls.
+
+All buttons must work.
+
+All forms must validate.
+
+All data must persist when persistence is expected.
+
+Do not leave placeholder interactions.
+
+---
+
+# 22. TESTING
+
+Create meaningful automated tests.
+
+Test:
+- Authentication and authorization.
+- Trip creation and editing.
+- Budget calculations.
+- Route optimization.
+- Collaboration permissions.
+- Voting.
+- Recommendation scoring.
+- Journal access.
+- Image upload validation.
+- Packing list persistence.
+- Price alerts.
+- Accessibility filters.
+- Gemini API error handling.
+- Destination search and pagination.
+
+Test critical business logic independently of Gemini.
+
+Run:
+- Backend tests.
+- Frontend tests where configured.
+- Frontend production build.
+- Backend startup validation.
+
+Do not disable tests to make the project pass.
+
+---
+
+# 23. DOCUMENTATION
+
+Update README.md.
+
+Document:
+- Project overview.
+- All 12 features.
+- Architecture.
+- Technology stack.
+- Installation.
+- Environment variables.
+- MongoDB setup.
+- Gemini configuration.
+- Maps configuration.
+- Image storage configuration.
+- API endpoints.
+- Seed scripts.
+- Testing.
+- Deployment.
+
+Add architecture diagrams using Mermaid where useful.
+
+Ensure documentation reflects the actual implementation.
+
+---
+
+# 24. EXECUTION STRATEGY — WORK AUTONOMOUSLY
+
+You have limited execution/context availability.
+
+Therefore, minimize unnecessary explanations and maximize implementation progress.
+
+Do not spend the majority of the available context discussing plans.
+
+Follow this workflow:
+
+**Step 1:** Inspect the repository and Git status.
+
+**Step 2:** Create a concise implementation plan.
+
+**Step 3:** Prepare the foundation and commit it.
+
+**Step 4:** Implement features sequentially.
+
+**Step 5:** Test each milestone.
+
+**Step 6:** Commit each completed milestone to main.
+
+**Step 7:** Push completed commits to origin/main.
+
+**Step 8:** Continue immediately with the next milestone.
+
+Do not wait for my approval between ordinary engineering decisions.
+
+Do not stop after creating frontend components.
+
+Implement the complete flow:
+
+Frontend → API → Backend business logic → MongoDB → Response → Frontend state.
+
+If an external API requires credentials that are unavailable, build the integration interface, environment configuration, validation, and graceful fallback. Clearly document the missing credential.
+
+Do not invent successful integrations.
+
+---
+
+# 25. CONTEXT AND USAGE LIMIT MANAGEMENT
+
+This is extremely important.
+
+Before your available context or usage limit is exhausted:
+
+1. Stop starting new features.
+2. Finish the current coherent implementation.
+3. Run relevant tests.
+4. Run the production build if feasible.
+5. Inspect the Git diff.
+6. Commit the completed work to `main`.
+7. Push to GitHub if possible.
+8. Update a persistent project progress file.
+
+Create or maintain:
+
+`TRAVELOGIA_PROGRESS.md`
+
+It must contain:
+
+- Completed milestones.
+- Pending milestones.
+- Files modified.
+- Database models added.
+- APIs implemented.
+- Tests executed.
+- Test results.
+- Latest successful commit SHA.
+- Current Git branch.
+- Remaining issues.
+- Exact next implementation steps.
+
+Update this file after every milestone.
+
+If the available context becomes insufficient, do not attempt an unsafe partial rewrite.
+
+Preserve the last working commit.
+
+The next session must be able to continue using `TRAVELOGIA_PROGRESS.md` without repeating completed work.
+
+**Do not sacrifice a working, committed implementation for an unfinished feature.**
+
+---
+
+# 26. FINAL ACCEPTANCE CHECKLIST
+
+All 12 features must be implemented and integrated.
+
+- [ ] Smart Trip Builder.
+- [ ] Intelligent Budget Optimizer.
+- [ ] Collaborative Trip Planning.
+- [ ] Route Intelligence.
+- [ ] Travel Readiness and Risk Intelligence.
+- [ ] Hidden Gems Discovery.
+- [ ] Destination Comparison.
+- [ ] Personalized Recommendations.
+- [ ] Travel Memory Journal.
+- [ ] Smart Packing Assistant.
+- [ ] Travel Deal and Price Watcher.
+- [ ] Accessibility-Aware Discovery.
+
+Additionally:
+
+- [ ] Existing UI preserved.
+- [ ] Existing features still work.
+- [ ] Backend and frontend integration complete.
+- [ ] MongoDB persistence implemented.
+- [ ] Maps functional.
+- [ ] Gemini API securely integrated.
+- [ ] Destination dataset expanded.
+- [ ] Pagination implemented.
+- [ ] Loading/error/empty states implemented.
+- [ ] Security issues fixed.
+- [ ] Automated tests added.
+- [ ] Frontend production build passes.
+- [ ] README updated.
+- [ ] Progress file maintained.
+- [ ] Milestone commits created on main.
+- [ ] Changes pushed to GitHub where authorized.
+
+---
+
+# 27. FINAL INSTRUCTION
+
+Start by inspecting the existing Travelogia repository.
+
+Do not give me a theoretical implementation guide.
+
+Do not simply generate code snippets in your response.
+
+**Actually implement the features in the existing project.**
+
+Preserve the existing UI and functionality.
+
+Work through all 12 milestones in order, committing tested progress directly to `main`.
+
+Prioritize complete, working, secure implementations over superficial feature count.
+
+If you cannot finish all 12 features in one session, leave the repository in a stable, tested, committed state and update `TRAVELOGIA_PROGRESS.md` with exact continuation instructions.
+
+Begin now.

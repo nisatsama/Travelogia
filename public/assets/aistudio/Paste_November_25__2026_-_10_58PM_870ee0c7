@@ -1,0 +1,1119 @@
+# MASTER ENGINEERING PROMPT — TRAVELOGIA FULL-STACK REMEDIATION & FEATURE UPGRADE
+
+Act as a **Senior Full-Stack Engineer, Software Architect, Application Security Engineer, and UI/UX Preservation Specialist**.
+
+Your task is to audit, repair, upgrade, and complete my existing project, **Travelogia**, a MERN-based travel booking platform.
+
+**GitHub Repository:** https://github.com/nisatsama/Travelogia
+
+**Existing Deployment:**
+- Frontend: https://travelogia-8m7e.vercel.app/
+- Backend: https://travelogia-nfpk.onrender.com/
+
+You must work with the existing repository and its architecture. Do not create an unrelated replacement application.
+
+---
+
+# 1. PRIMARY OBJECTIVE
+
+Transform Travelogia into a secure, functional, responsive, scalable, and polished full-stack travel booking platform.
+
+The upgraded application must include:
+
+- Secure authentication and authorization.
+- Functional travel destination management.
+- Reliable booking and pricing calculations.
+- Expanded destination catalogue with meaningful data.
+- Interactive maps and location integration.
+- Pagination, filtering, and sorting.
+- Consistent loading, error, and empty states.
+- Functional user profiles and favorites.
+- A Gemini-powered AI travel assistant.
+- Improved backend architecture and API reliability.
+- Automated tests and deployment readiness.
+
+**MOST IMPORTANT CONSTRAINT: PRESERVE THE EXISTING UI.**
+
+The current visual identity, layout, color palette, typography, navigation, component styling, animations, spacing, cards, and overall design must remain recognizable.
+
+Do not redesign the application from scratch. Do not replace existing pages with generic dashboard templates. Do not remove existing features simply to make implementation easier.
+
+You may improve responsiveness, accessibility, consistency, and small usability issues, but preserve the existing design language.
+
+---
+
+# 2. FIRST STEP: REPOSITORY AUDIT
+
+Before modifying anything:
+
+1. Inspect the complete repository structure.
+2. Understand the existing frontend and backend architecture.
+3. Inspect all React pages, components, hooks, styles, routes, models, middleware, and API endpoints.
+4. Understand existing MongoDB schemas and relationships.
+5. Identify existing features and their current implementation status.
+6. Identify broken functionality, security vulnerabilities, duplicated logic, incomplete endpoints, and inconsistent API contracts.
+7. Check frontend/backend compatibility.
+8. Identify existing environment variables and deployment assumptions.
+9. Prepare a concise implementation plan.
+
+Do not blindly overwrite existing files.
+
+Reuse existing components, styling, APIs, models, and functionality wherever possible.
+
+If a feature already works, preserve it unless there is a demonstrable reason to improve it.
+
+---
+
+# 3. CRITICAL SECURITY FIXES
+
+These issues must be fixed before adding new features.
+
+## A. Fix privilege escalation during signup
+
+The existing signup implementation accepts the role from the request body.
+
+This allows a public user to potentially register as an administrator.
+
+Requirements:
+
+- Never accept `role` from public signup requests.
+- Assign the default role `user` on the backend.
+- Admin accounts must be created through a protected administrative process.
+- Validate roles on the backend.
+- Ensure admin-only routes enforce authorization independently of frontend navigation.
+
+Test that sending `{ "role": "admin" }` during public registration cannot create an administrator.
+
+## B. Fix JWT security
+
+- Remove fallback JWT secrets.
+- Require `JWT_SECRET` through environment configuration.
+- Fail application startup if critical secrets are missing.
+- Use consistent token signing and verification.
+- Validate token expiration and claims.
+- Handle missing, expired, malformed, and invalid tokens correctly.
+- Do not expose secrets in API responses or logs.
+
+Prefer secure HttpOnly, Secure, SameSite cookies for authentication where compatible with the existing architecture.
+
+If cookies are introduced, implement CSRF protection and configure CORS credentials correctly.
+
+Do not store long-lived authentication tokens in localStorage.
+
+## C. Secure the backend
+
+Implement:
+
+- Request validation.
+- Centralized error handling.
+- Authentication middleware.
+- Authorization middleware.
+- Login and signup rate limiting.
+- Helmet security headers.
+- Appropriate CORS restrictions.
+- Secure cookie configuration where applicable.
+- MongoDB query/input sanitization.
+- Protection against mass assignment.
+- Safe error responses.
+- Request size limits.
+
+Never return stack traces, database internals, passwords, JWT secrets, or sensitive implementation details to clients.
+
+Validate ObjectIds before querying MongoDB.
+
+---
+
+# 4. BACKEND ARCHITECTURE REFACTORING
+
+The backend should not remain a large monolithic application file.
+
+Refactor into a maintainable architecture while preserving existing API functionality.
+
+Suggested structure:
+
+backend/
+  config/
+    database.js
+    env.js
+
+  controllers/
+    authController.js
+    userController.js
+    travelController.js
+    bookingController.js
+    favoriteController.js
+    chatbotController.js
+
+  middleware/
+    auth.js
+    admin.js
+    validate.js
+    errorHandler.js
+    rateLimiter.js
+
+  models/
+    User.js
+    Travel.js
+    Booking.js
+    Favourite.js
+
+  routes/
+    authRoutes.js
+    userRoutes.js
+    travelRoutes.js
+    bookingRoutes.js
+    favoriteRoutes.js
+    chatbotRoutes.js
+
+  services/
+    bookingService.js
+    pricingService.js
+    geminiService.js
+
+  validators/
+    authValidator.js
+    bookingValidator.js
+    travelValidator.js
+
+  utils/
+    ApiError.js
+    asyncHandler.js
+    pagination.js
+
+  app.js
+  server.js
+
+Adapt the structure to the existing project rather than forcing unnecessary changes.
+
+Requirements:
+
+- Separate routing, business logic, database access, and validation.
+- Avoid duplicated logic.
+- Use async/await consistently.
+- Implement centralized error handling.
+- Return consistent API response structures.
+- Use appropriate HTTP status codes.
+- Maintain clean naming conventions.
+- Keep the code readable and maintainable.
+
+---
+
+# 5. COMPLETE AND SECURE BOOKING SYSTEM
+
+The booking functionality must work correctly from frontend to database.
+
+## Critical pricing correction
+
+Never trust the total booking price supplied by the frontend.
+
+The backend must:
+
+1. Receive the destination ID, traveller count, and duration.
+2. Retrieve the destination from MongoDB.
+3. Validate the destination.
+4. Validate traveller count and duration.
+5. Calculate the total cost using trusted server-side destination pricing.
+6. Save the calculated amount.
+7. Return the confirmed booking details.
+
+Do not use a client-submitted `totalCost` as the source of truth.
+
+## Improve booking model
+
+Add appropriate fields such as:
+
+- Booking reference.
+- User ID.
+- Destination ID.
+- Number of travellers.
+- Travel start date.
+- Travel end date.
+- Duration.
+- Price per traveller/night, as appropriate to the existing pricing model.
+- Total cost.
+- Currency.
+- Booking status.
+- Payment status.
+- Creation timestamp.
+- Updated timestamp.
+
+Use suitable validation and database indexes.
+
+## Booking requirements
+
+- Prevent invalid dates.
+- Prevent zero or negative travellers.
+- Prevent invalid durations.
+- Prevent booking deleted or unavailable destinations.
+- Prevent duplicate submissions.
+- Show booking confirmation.
+- Allow users to view their booking history.
+- Allow users to cancel bookings under defined rules.
+- Ensure users can only access their own bookings unless they are administrators.
+- Implement booking capacity checks if capacity is supported.
+- Use atomic database operations or transactions where necessary to prevent overbooking.
+
+Do not claim to implement real payment processing unless a legitimate payment gateway is integrated.
+
+---
+
+# 6. DESTINATION CATALOGUE EXPANSION
+
+Expand the Travelogia destination database substantially.
+
+The current catalogue should become a useful travel discovery experience rather than a small collection of sample destinations.
+
+## Target dataset
+
+Add at least **60–100 well-researched destination records**.
+
+Prioritize India initially, then include selected international destinations.
+
+Suggested Indian destinations:
+
+- Darjeeling
+- Gangtok
+- Kalimpong
+- Shillong
+- Cherrapunji
+- Tawang
+- Kaziranga
+- Puri
+- Digha
+- Sundarbans
+- Varanasi
+- Jaipur
+- Udaipur
+- Jaisalmer
+- Jodhpur
+- Agra
+- Rishikesh
+- Manali
+- Shimla
+- Kasol
+- Leh
+- Srinagar
+- Gulmarg
+- Goa
+- Munnar
+- Alleppey
+- Wayanad
+- Ooty
+- Coorg
+- Hampi
+- Mysore
+- Hyderabad
+- Mumbai
+- Delhi
+- Amritsar
+- Andaman Islands
+- Lakshadweep
+- Rann of Kutch
+- Spiti Valley
+- Ziro Valley
+
+International destinations:
+
+- Bali
+- Bangkok
+- Phuket
+- Singapore
+- Dubai
+- Abu Dhabi
+- Maldives
+- Kathmandu
+- Pokhara
+- Paris
+- Rome
+- London
+- Tokyo
+- Seoul
+- Istanbul
+- Barcelona
+- Switzerland
+- New York
+- Cape Town
+- Kuala Lumpur
+
+You may add more destinations to reach the target.
+
+## Destination data schema
+
+Each destination should contain appropriate fields:
+
+- Title.
+- Slug.
+- Description.
+- Country.
+- State/region.
+- City.
+- Latitude.
+- Longitude.
+- Address/location.
+- Cover image.
+- Image gallery.
+- Price per night or appropriate pricing basis.
+- Category.
+- Average rating.
+- Best time to visit.
+- Estimated trip duration.
+- Highlights.
+- Amenities or travel facilities.
+- Activities.
+- Travel tips.
+- Approximate budget.
+- Featured status.
+- Availability status.
+- Created timestamp.
+
+Use realistic and internally consistent data.
+
+Do not fabricate verified ratings, customer reviews, official prices, or real-time availability.
+
+Clearly label estimated prices and budgets as estimates.
+
+Use reliable, legally usable image sources. Do not hotlink random images or use broken image URLs.
+
+Add a seed script that inserts the destination data into MongoDB.
+
+The seed script must:
+- Avoid creating duplicate destinations.
+- Be safe to run more than once.
+- Use upsert or another idempotent strategy.
+- Provide clear success and failure output.
+
+---
+
+# 7. INTERACTIVE MAP INTEGRATION
+
+Integrate interactive maps into Travelogia.
+
+Prefer **Leaflet with OpenStreetMap** for a free and practical initial implementation.
+
+Do not require a paid maps API for basic functionality.
+
+## Required functionality
+
+### A. Destination details page
+
+Add an interactive map showing the destination's exact stored coordinates.
+
+Display:
+- Destination marker.
+- Destination name.
+- Short description.
+- Location details.
+- Link or action to open directions.
+
+### B. Destination discovery page
+
+Add an optional map view alongside the existing destination listing.
+
+Users should be able to:
+- Switch between list/grid view and map view.
+- View destination markers.
+- Click markers to see destination previews.
+- Navigate to the corresponding destination details page.
+
+### C. Location features
+
+Where practical:
+- Display latitude and longitude.
+- Support map zoom and pan.
+- Provide an external directions link.
+- Handle missing coordinates gracefully.
+
+Do not automatically request or track the user's precise location.
+
+Only request geolocation when the user explicitly activates a location-related feature, and explain why permission is required.
+
+Ensure the map is responsive and does not break the existing page layout.
+
+---
+
+# 8. PAGINATION, FILTERING AND SORTING
+
+Implement proper server-side pagination for destinations and other suitable listing endpoints.
+
+Do not load the entire database on every request.
+
+## API requirements
+
+Support parameters such as:
+
+- `page`
+- `limit`
+- `search`
+- `category`
+- `country`
+- `minPrice`
+- `maxPrice`
+- `minRating`
+- `sortBy`
+- `sortOrder`
+
+Example:
+
+GET /api/travels?page=1&limit=12&category=Adventure&sortBy=pricePerNight&sortOrder=asc
+
+Return a consistent response:
+
+{
+  "success": true,
+  "data": [],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 5,
+    "totalItems": 60,
+    "limit": 12,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
+}
+
+Validate pagination values and impose a sensible maximum page size.
+
+## Frontend requirements
+
+Preserve the current destination card design.
+
+Add:
+- Previous and Next buttons.
+- Page numbers where appropriate.
+- Current page indicator.
+- Loading state during page changes.
+- Empty results state.
+- Search and filter integration.
+- Sorting controls.
+- URL query parameter synchronization where practical.
+
+Filtering and sorting must work with pagination on the backend, not just on the currently loaded frontend items.
+
+---
+
+# 9. LOADING, ERROR AND EMPTY STATES
+
+Improve the entire frontend's data-fetching experience without changing the visual identity.
+
+Every page that loads remote data should have appropriate states.
+
+Implement:
+
+### Loading
+- Skeleton cards matching the existing destination card design.
+- Loading indicators for booking submission.
+- Profile loading placeholders.
+- Map loading state.
+- Chatbot response indicator.
+- Pagination loading feedback.
+
+### Error
+- Friendly error messages.
+- Retry action where appropriate.
+- Network failure handling.
+- Authentication expiry handling.
+- Safe fallback UI when an API fails.
+
+### Empty
+- No destinations found.
+- No favorites yet.
+- No bookings yet.
+- No search results.
+- No profile data.
+
+Avoid blank pages, infinite spinners, or silent API failures.
+
+Prevent repeated submissions while an operation is in progress.
+
+Use consistent frontend state management and avoid unnecessary duplicate API requests.
+
+---
+
+# 10. GEMINI-POWERED AI TRAVEL CHATBOT
+
+Integrate a fully functional AI travel assistant using the **Google Gemini API**.
+
+The chatbot should be a useful feature of Travelogia, not a decorative chat window.
+
+## Core objective
+
+Create a chatbot named **Travelogia AI**.
+
+It should help users discover destinations, plan trips, compare places, understand budgets, and get travel recommendations.
+
+## Gemini integration requirements
+
+- Use the official Google Gen AI SDK appropriate for the existing backend runtime.
+- Keep the Gemini API key exclusively on the backend.
+- Never expose the API key in frontend code, browser bundles, network responses, or Git commits.
+- Configure the key using `GEMINI_API_KEY`.
+- Configure the model through `GEMINI_MODEL`.
+- Use a currently supported Gemini model and verify the SDK/model compatibility before implementation.
+- Use environment variables for all credentials.
+- Implement server-side request validation.
+- Implement rate limiting.
+- Handle API errors and timeouts.
+- Avoid sending unnecessary personal information to Gemini.
+- Limit request size and conversation history.
+- Never trust chatbot-generated booking prices or availability.
+
+Suggested endpoint:
+
+POST /api/chatbot/message
+
+Request:
+
+{
+  "message": "Suggest a 5-day trip in Northeast India within ₹15000",
+  "conversationHistory": []
+}
+
+Response:
+
+{
+  "success": true,
+  "reply": "..."
+}
+
+Adapt the request and response structure to the actual implementation.
+
+## Chatbot capabilities
+
+The chatbot should support:
+
+1. Destination recommendations.
+2. Budget-based trip suggestions.
+3. Trip duration recommendations.
+4. Best-season guidance.
+5. Destination comparisons.
+6. Family, solo, couple, and group trip suggestions.
+7. Adventure, nature, beach, heritage, and cultural travel recommendations.
+8. Suggested itineraries.
+9. Travel packing checklists.
+10. Travel tips and safety considerations.
+11. Suggestions based on destinations already present in the Travelogia database.
+12. Navigation assistance to destination pages.
+
+## Ground recommendations in Travelogia data
+
+The chatbot must be able to retrieve relevant destinations from the MongoDB database.
+
+For example, when a user asks:
+
+"Suggest destinations in India under ₹10,000."
+
+The backend should query the database using relevant constraints and provide matching destinations to Gemini as context.
+
+The chatbot should not invent destinations, prices, database records, or availability.
+
+Clearly distinguish between:
+- Database-backed destination information.
+- Approximate travel estimates.
+- General AI-generated travel advice.
+
+If a requested destination is not in the database, the chatbot may offer general guidance but must not pretend it is an existing Travelogia listing.
+
+## Chatbot UI
+
+Preserve the current Travelogia design language.
+
+Implement:
+- Floating chatbot launcher.
+- Expandable chat panel.
+- Minimize and close actions.
+- Message bubbles for user and assistant.
+- Typing indicator.
+- Suggested prompt chips.
+- Conversation history during the current session.
+- Clear conversation option.
+- Error and retry handling.
+- Mobile-responsive layout.
+
+Suggested starter prompts:
+
+- "Plan a 5-day trip under ₹15,000."
+- "Best destinations to visit in December?"
+- "Compare Darjeeling and Gangtok."
+- "Suggest peaceful destinations in India."
+- "Plan a weekend trip from Kolkata."
+
+The chatbot must not block access to the rest of the application.
+
+## Important limitations
+
+Do not allow the chatbot to:
+- Confirm bookings.
+- Process payments.
+- Guarantee hotel or transport availability.
+- Present estimated prices as verified prices.
+- Provide unsafe or fabricated travel claims.
+
+It can direct users to actual destination pages and the existing booking workflow.
+
+---
+
+# 11. AUTHENTICATION AND USER PROFILE IMPROVEMENTS
+
+Improve existing authentication and profile features.
+
+Requirements:
+
+- Signup.
+- Login.
+- Logout.
+- Protected routes.
+- Admin-protected routes.
+- Secure password hashing.
+- Email normalization.
+- Appropriate password validation.
+- Duplicate email handling.
+- Token/session expiration.
+- Profile retrieval.
+- Profile editing.
+- Booking history.
+- Favorites management.
+
+The Edit Profile button must work.
+
+Users should be able to update appropriate profile fields.
+
+Do not allow users to modify their role or administrative privileges.
+
+Remove hardcoded profile statistics such as fabricated package counts or visited-country counts.
+
+Only display statistics derived from actual database records.
+
+---
+
+# 12. FAVORITES MANAGEMENT
+
+Unify the current favorites implementation.
+
+Avoid maintaining duplicate favorite relationships in both the User document and a separate collection unless there is a strong architectural reason.
+
+Implement:
+
+- Add favorite.
+- Remove favorite.
+- List favorites.
+- Prevent duplicate favorites.
+- Verify destination existence.
+- Ensure users can access only their own favorites.
+
+The frontend must update the favorite icon correctly and show useful empty states.
+
+---
+
+# 13. ADMIN AND DESTINATION MANAGEMENT
+
+Complete the existing admin functionality.
+
+An administrator should be able to:
+
+- Add destinations.
+- Edit destinations.
+- Delete destinations.
+- View destinations.
+- View bookings.
+- View users.
+- Manage destination availability.
+- View relevant booking information.
+
+Every admin operation must be protected on the backend.
+
+Do not rely on hiding buttons or frontend route protection as the only authorization mechanism.
+
+Validate all submitted data.
+
+For destination deletion, consider existing booking references and use safe deletion or archival behavior rather than silently breaking historical records.
+
+If the frontend references an admin route that does not exist, implement the route consistently with the existing design.
+
+---
+
+# 14. FRONTEND API ARCHITECTURE
+
+Centralize all API configuration.
+
+Create a reusable Axios instance with:
+
+- Environment-based API base URL.
+- Appropriate credentials configuration.
+- Consistent request handling.
+- Consistent response/error handling.
+- Authentication/session handling.
+- Timeout configuration.
+
+Use:
+
+`VITE_API_URL`
+
+Do not hardcode backend URLs across individual React components.
+
+Remove unnecessary API calls outside React lifecycle or event handlers.
+
+Use React hooks correctly.
+
+Avoid:
+- Duplicate requests.
+- Memory leaks.
+- Unhandled promise rejections.
+- Direct DOM manipulation where React state is appropriate.
+- Inconsistent API response assumptions.
+
+Use appropriate reusable hooks or utilities for data fetching.
+
+---
+
+# 15. RESPONSIVENESS AND ACCESSIBILITY
+
+Preserve the current design while ensuring functionality across:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+Fix:
+- Horizontal overflow.
+- Broken image layouts.
+- Inconsistent card heights.
+- Navigation issues.
+- Chatbot overflow.
+- Map responsiveness.
+- Modal and dialog sizing.
+
+Add appropriate:
+- Accessible labels.
+- Keyboard navigation.
+- Focus states.
+- Alt text.
+- Semantic HTML.
+- Form error descriptions.
+
+Do not sacrifice the existing visual design for generic accessibility components.
+
+---
+
+# 16. DATABASE AND PERFORMANCE IMPROVEMENTS
+
+Review MongoDB schemas and introduce appropriate indexes.
+
+Potential indexes:
+
+- User email: unique.
+- Travel slug: unique.
+- Travel category.
+- Travel country.
+- Travel price.
+- Booking user ID.
+- Booking destination ID.
+- Booking status.
+- Favorite user ID and destination ID: compound unique index.
+
+Use indexes based on actual query patterns.
+
+Additional requirements:
+
+- Use `.select()` to avoid retrieving unnecessary fields.
+- Use `.lean()` for read-only queries where appropriate.
+- Avoid N+1 database queries.
+- Use pagination for large collections.
+- Avoid unbounded database reads.
+- Use sensible request timeouts.
+- Avoid expensive operations in frequently called routes.
+
+Do not introduce caching unless there is a clear need and invalidation strategy.
+
+---
+
+# 17. TESTING REQUIREMENTS
+
+Do not consider the task complete merely because the application compiles.
+
+Create meaningful automated tests.
+
+Use testing tools compatible with the current stack.
+
+Suggested backend tools:
+- Jest or Vitest.
+- Supertest.
+- MongoDB Memory Server.
+
+Test at minimum:
+
+### Authentication
+- Successful signup.
+- Duplicate signup.
+- Invalid email.
+- Invalid password.
+- Successful login.
+- Invalid credentials.
+- Missing token.
+- Expired token.
+- Unauthorized admin access.
+- Signup role escalation attempt.
+
+### Destinations
+- Destination listing.
+- Pagination.
+- Search.
+- Filtering.
+- Sorting.
+- Invalid page values.
+- Missing destination.
+- Admin create/update/delete permissions.
+
+### Booking
+- Valid booking.
+- Invalid traveller count.
+- Invalid dates.
+- Nonexistent destination.
+- Client price manipulation attempt.
+- Unauthorized booking access.
+- Booking cancellation.
+- Duplicate submission protection.
+- Capacity/concurrency handling if supported.
+
+### Favorites
+- Add favorite.
+- Duplicate favorite.
+- Remove favorite.
+- List favorites.
+- Unauthorized access.
+
+### Gemini chatbot
+- Missing message.
+- Invalid request.
+- Rate limiting.
+- Gemini API failure.
+- Timeout.
+- Database-grounded recommendations.
+- No API key leakage.
+
+Frontend tests should cover key user flows and loading/error states.
+
+Add a CI workflow that runs backend tests and frontend production builds on pull requests.
+
+Fix all failing tests rather than disabling them.
+
+---
+
+# 18. README AND DOCUMENTATION
+
+Update the README to reflect the actual implementation.
+
+Include:
+
+- Project overview.
+- Features.
+- Screenshots.
+- Tech stack.
+- Architecture.
+- Folder structure.
+- Installation instructions.
+- Environment variable documentation.
+- Backend setup.
+- Frontend setup.
+- MongoDB setup.
+- Destination seeding instructions.
+- Gemini API setup.
+- Maps setup.
+- API endpoint documentation.
+- Testing commands.
+- Deployment instructions.
+
+Remove outdated information, inaccurate React versions, broken links, and claims that do not match the implementation.
+
+Create an architecture diagram using Mermaid if appropriate.
+
+Document the fact that the Gemini API key must remain server-side.
+
+---
+
+# 19. ENVIRONMENT VARIABLES
+
+Prepare `.env.example` files without real secrets.
+
+Backend example:
+
+PORT=
+MONGODB_URI=
+JWT_SECRET=
+GEMINI_API_KEY=
+GEMINI_MODEL=
+FRONTEND_URL=
+NODE_ENV=
+
+Frontend example:
+
+VITE_API_URL=
+
+Add any additional variables only when required.
+
+Never commit `.env` files containing secrets.
+
+Ensure `.gitignore` covers environment files, build artifacts, dependencies, logs, and local development data.
+
+---
+
+# 20. IMPLEMENTATION ORDER
+
+Follow this order to reduce regressions.
+
+**Phase 1 — Audit and security**
+- Inspect repository.
+- Fix role escalation.
+- Fix JWT configuration.
+- Add validation.
+- Add rate limiting.
+- Fix unsafe error handling.
+- Fix booking price manipulation.
+- Remove unnecessary frontend API calls.
+
+**Phase 2 — Backend completion**
+- Refactor backend architecture.
+- Implement missing CRUD endpoints.
+- Complete booking logic.
+- Complete favorites.
+- Complete profile editing.
+- Complete admin functionality.
+- Implement consistent API responses.
+
+**Phase 3 — Destination data**
+- Expand destination dataset.
+- Add seed scripts.
+- Validate destination records.
+- Add appropriate indexes.
+
+**Phase 4 — Maps**
+- Integrate Leaflet/OpenStreetMap.
+- Add destination markers.
+- Add map view.
+- Add external directions links.
+
+**Phase 5 — Pagination and UX**
+- Add server-side pagination.
+- Add search/filter/sort.
+- Add skeleton loaders.
+- Add loading, error, and empty states.
+
+**Phase 6 — Gemini chatbot**
+- Integrate Gemini through backend.
+- Add database-grounded recommendations.
+- Add chatbot API.
+- Build responsive chatbot UI.
+
+**Phase 7 — Quality assurance**
+- Add automated tests.
+- Fix frontend and backend failures.
+- Add CI.
+- Verify all existing pages.
+- Verify responsive behavior.
+
+**Phase 8 — Documentation and deployment**
+- Update README.
+- Update environment examples.
+- Verify Vercel and Render configuration.
+- Check production API connectivity.
+- Confirm all new features work in deployment.
+
+---
+
+# 21. STRICT ENGINEERING RULES
+
+Follow these rules throughout the task:
+
+1. Do not redesign the existing UI.
+2. Do not replace the application with a new boilerplate.
+3. Do not remove working features.
+4. Do not fabricate data or claim unimplemented functionality.
+5. Do not hardcode secrets or API keys.
+6. Do not trust frontend input for pricing, roles, permissions, or booking availability.
+7. Do not use mock data as a substitute for database functionality.
+8. Do not add unnecessary dependencies.
+9. Do not silently ignore errors.
+10. Do not leave buttons or controls nonfunctional.
+11. Do not disable tests to achieve a passing result.
+12. Do not break existing routes without providing compatible replacements.
+13. Do not change the existing color palette, typography, or component identity without necessity.
+14. Keep frontend and backend API contracts synchronized.
+15. Use clean, production-oriented code.
+16. Make database seed scripts idempotent.
+17. Keep the Gemini key server-side.
+18. Avoid making unsupported claims about live maps, availability, prices, or AI recommendations.
+19. Verify all new dependencies and APIs against their current documentation.
+20. Never report a feature as completed until it has been implemented and tested.
+
+---
+
+# 22. FINAL ACCEPTANCE CRITERIA
+
+The work is complete only when:
+
+- [ ] Existing UI identity is preserved.
+- [ ] Existing pages and routes continue to work.
+- [ ] Public signup cannot create admin accounts.
+- [ ] JWT configuration is secure and consistent.
+- [ ] Booking prices are calculated by the backend.
+- [ ] Booking ownership and permissions are enforced.
+- [ ] Destination CRUD works.
+- [ ] At least 60–100 destination records can be seeded without duplicates.
+- [ ] Search, filters, and server-side pagination work.
+- [ ] Interactive destination maps work.
+- [ ] Loading, error, and empty states exist.
+- [ ] Profile editing works.
+- [ ] Favorites can be added and removed.
+- [ ] Admin functionality is protected.
+- [ ] Gemini chatbot works through a secure backend integration.
+- [ ] Chatbot recommendations use actual Travelogia destination data where relevant.
+- [ ] API keys are not exposed.
+- [ ] Backend tests pass.
+- [ ] Frontend production build succeeds.
+- [ ] CI workflow is configured.
+- [ ] README and setup instructions are accurate.
+- [ ] Production deployment configuration is documented and verified.
+
+---
+
+# 23. EXECUTION AND REPORTING INSTRUCTIONS
+
+Do not attempt a superficial one-shot rewrite.
+
+Work incrementally.
+
+For each phase:
+
+1. Explain the issues identified.
+2. List the files that need modification.
+3. Implement the changes.
+4. Explain important architectural decisions.
+5. Run relevant tests or builds.
+6. Fix regressions.
+7. Summarize completed work.
+8. Identify remaining tasks.
+
+If you have direct repository access, modify the existing repository rather than merely providing suggested code.
+
+If a required file, credential, API key, or external service is unavailable, explain the limitation and implement the remaining parts without inventing successful integration.
+
+Do not ask me to approve every small implementation decision. Make sensible engineering decisions that preserve the existing project.
+
+However, do not perform destructive database operations, overwrite important user data, or expose secrets.
+
+At the end, provide:
+
+- A summary of changes.
+- Files created and modified.
+- Security issues fixed.
+- New features implemented.
+- Test results.
+- Build results.
+- Environment variables required.
+- Deployment steps.
+- Known limitations.
+- Remaining work.
+
+**START WITH THE FULL REPOSITORY AUDIT. THEN IMPLEMENT THE PROJECT IN THE PHASES ABOVE.**
+
+The final result must be a genuinely working, secure, maintainable Travelogia application—not merely a visually impressive demo.
