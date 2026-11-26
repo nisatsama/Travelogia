@@ -499,6 +499,41 @@ const Details = () => {
             </div>
           )}
 
+          {/* COMMERCE INTEGRATION STRIP (Modules 13–24) */}
+          <div className="glass-section">
+            <h2 className="section-title">🛎️ Plan &amp; Book in {travel.city}</h2>
+            <div className="v2-chip-row">
+              <button
+                type="button"
+                className="v2-btn v2-btn-accent v2-btn-sm"
+                onClick={() => navigate(`/stays?city=${encodeURIComponent(travel.city || "")}`)}
+              >
+                🏨 Find Hotels &amp; Homestays
+              </button>
+              <button
+                type="button"
+                className="v2-btn v2-btn-primary v2-btn-sm"
+                onClick={() => navigate("/transport")}
+              >
+                ✈️ Flights, Trains, Bus &amp; Cabs
+              </button>
+              <button
+                type="button"
+                className="v2-btn v2-btn-secondary v2-btn-sm"
+                onClick={() => navigate(`/experiences?city=${encodeURIComponent(travel.city || "")}`)}
+              >
+                🧭 Activities, Guides &amp; Dining
+              </button>
+              <button
+                type="button"
+                className="v2-btn v2-btn-secondary v2-btn-sm"
+                onClick={() => navigate("/dashboard")}
+              >
+                📊 Open Trip Dashboard
+              </button>
+            </div>
+          </div>
+
           {/* BACK BUTTON */}
 
           <button

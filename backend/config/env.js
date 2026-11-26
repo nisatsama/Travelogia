@@ -35,6 +35,11 @@ const env = {
   FRONTEND_URL: process.env.FRONTEND_URL || "",
   ADMIN_SETUP_SECRET: process.env.ADMIN_SETUP_SECRET || "",
   COOKIE_NAME: "travelogia_auth",
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || "",
+  RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || "",
+  RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET || "",
+  FLIGHT_PROVIDER_API_KEY: process.env.FLIGHT_PROVIDER_API_KEY || "",
 };
 
 module.exports = env;
+

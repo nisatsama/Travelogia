@@ -5,7 +5,12 @@ import { useAuth } from "../context/AuthContext";
 
 const V2_LINKS = [
   { to: "/travels", label: "Destinations" },
-  { to: "/trip-builder", label: "Trip Builder" },
+  { to: "/stays", label: "Stays" },
+  { to: "/transport", label: "Transport" },
+  { to: "/experiences", label: "Experiences" },
+  { to: "/dashboard", label: "Trip Hub" },
+  { to: "/wallet", label: "Wallet & Insurance" },
+  { to: "/trip-builder", label: "AI Builder" },
   { to: "/budget-optimizer", label: "Budget" },
   { to: "/collaborate", label: "Collaborate" },
   { to: "/route-planner", label: "Routes" },
@@ -28,7 +33,7 @@ export default function V2NavBar() {
     let active = true;
     (async () => {
       try {
-        const res = await api.get("/price-watch/notifications");
+        const res = await api.get("/notifications");
         if (!active) return;
         setNotifications(res.data?.data || []);
         setUnreadCount(Number(res.data?.unreadCount || 0));
@@ -43,7 +48,7 @@ export default function V2NavBar() {
 
   const handleMarkRead = async (id) => {
     try {
-      await api.patch(`/price-watch/notifications/${id}/read`);
+      await api.patch(`/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, read: true } : n)),
       );
@@ -94,11 +99,11 @@ export default function V2NavBar() {
                   >
                     <strong>Notifications</strong>
                     <Link
-                      to="/price-watcher"
+                      to="/dashboard"
                       onClick={() => setOpen(false)}
                       style={{ color: "#2563eb", fontSize: "12px" }}
                     >
-                      Manage Alerts
+                      Dashboard &amp; Prefs
                     </Link>
                   </div>
                   {notifications.length === 0 ? (

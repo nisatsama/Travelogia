@@ -36,6 +36,17 @@ const {
 const journalRoutes = require("./routes/journalRoutes");
 const packingRoutes = require("./routes/packingRoutes");
 const priceWatchRoutes = require("./routes/priceWatchRoutes");
+const stayRoutes = require("./routes/stayRoutes");
+const transportRoutes = require("./routes/transportRoutes");
+const experienceRoutes = require("./routes/experienceRoutes");
+const {
+  paymentsRouter,
+  walletRouter,
+  notificationsRouter,
+  dashboardRouter,
+  insuranceRouter,
+  handlePaymentWebhook,
+} = require("./routes/commerceHubRoutes");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -81,8 +92,15 @@ app.use(
   }),
 );
 
-// Request size limits & parsers
-app.use(express.json({ limit: "100kb" }));
+// Request size limits & parsers (preserve rawBody for Razorpay webhook HMAC verification)
+app.use(
+  express.json({
+    limit: "100kb",
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 app.use(cookieParser());
 app.use(sanitizeRequest);
@@ -92,6 +110,10 @@ app.use(sanitizeRequest);
 // ============================
 const apiRouter = express.Router();
 apiRouter.use(apiLimiter);
+
+// Server-to-server signed Razorpay webhook (authenticated via HMAC-SHA256 X-Razorpay-Signature, not browser cookies)
+apiRouter.post("/payments/webhook", handlePaymentWebhook);
+
 apiRouter.use(csrfProtect);
 
 apiRouter.get("/", (req, res) => {
@@ -136,6 +158,16 @@ apiRouter.use("/recommendations", recommendationsRouter);
 apiRouter.use("/journals", journalRoutes);
 apiRouter.use("/packing", packingRoutes);
 apiRouter.use("/price-watch", priceWatchRoutes);
+
+// Complete Travel Commerce System (Modules 13–29)
+apiRouter.use("/stays", stayRoutes);
+apiRouter.use("/transport", transportRoutes);
+apiRouter.use("/experiences", experienceRoutes);
+apiRouter.use("/payments", paymentsRouter);
+apiRouter.use("/wallet", walletRouter);
+apiRouter.use("/notifications", notificationsRouter);
+apiRouter.use("/dashboard", dashboardRouter);
+apiRouter.use("/insurance", insuranceRouter);
 
 // 404 for unknown API paths
 apiRouter.use((req, res) => {

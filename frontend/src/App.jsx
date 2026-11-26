@@ -26,6 +26,11 @@ import DestinationCompare from "./pages/DestinationCompare";
 import TravelJournal from "./pages/TravelJournal";
 import PackingAssistant from "./pages/PackingAssistant";
 import PriceWatcher from "./pages/PriceWatcher";
+import StaysMarketplace from "./pages/StaysMarketplace";
+import TransportHub from "./pages/TransportHub";
+import ExperiencesHub from "./pages/ExperiencesHub";
+import TripDashboard from "./pages/TripDashboard";
+import TravelWallet from "./pages/TravelWallet";
 
 function App() {
   return (
@@ -75,6 +80,13 @@ function App() {
           <Route path="/journal" element={<TravelJournal />} />
           <Route path="/packing" element={<PackingAssistant />} />
           <Route path="/price-watcher" element={<PriceWatcher />} />
+
+          {/* Complete Travel Commerce System (Modules 13–29) */}
+          <Route path="/stays" element={<StaysMarketplace />} />
+          <Route path="/transport" element={<TransportHub />} />
+          <Route path="/experiences" element={<ExperiencesHub />} />
+          <Route path="/dashboard" element={<TripDashboard />} />
+          <Route path="/wallet" element={<TravelWallet />} />
         </Routes>
         <TravelogiaChat />
       </Router>

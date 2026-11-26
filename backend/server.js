@@ -4,6 +4,7 @@ const env = require("./config/env");
 const { connectDatabase } = require("./config/database");
 const { initSocketServer } = require("./services/socketService");
 const { startPriceWatchScheduler } = require("./services/priceWatcherService");
+const { startReminderScheduler } = require("./services/notificationService");
 
 async function startServer() {
   const server = http.createServer(app);
@@ -17,6 +18,7 @@ async function startServer() {
   server.headersTimeout = 66000;
 
   startPriceWatchScheduler();
+  startReminderScheduler();
 
   // Connect to MongoDB in the background so port binding is never delayed
   connectDatabase().catch((err) => {

@@ -127,9 +127,15 @@ function Home() {
         </div>
       </section>
 
-      {/* TRAVELOGIA 2.0 SMART PLANNING SUITE RIBBON */}
-      <div className="v2-home-ribbon" aria-label="Travelogia 2.0 Smart Tools">
-        <span className="v2-home-ribbon-label">Travelogia 2.0:</span>
+      {/* TRAVELOGIA 2.0 SMART PLANNING & COMMERCE RIBBON */}
+      <div className="v2-home-ribbon" aria-label="Travelogia 2.0 Smart Tools and Commerce">
+        <span className="v2-home-ribbon-label">Travel Commerce:</span>
+        <Link to="/stays">🏨 Stays &amp; Hotels</Link>
+        <Link to="/transport">✈️ Flights, Trains, Bus &amp; Cabs</Link>
+        <Link to="/experiences">🧭 Activities, Guides &amp; Dining</Link>
+        <Link to="/dashboard">📊 Trip Dashboard</Link>
+        <Link to="/wallet">🪪 Wallet &amp; Insurance</Link>
+        <span className="v2-home-ribbon-label" style={{ marginLeft: "6px" }}>Smart Suite:</span>
         <Link to="/trip-builder">✨ AI Trip Builder</Link>
         <Link to="/budget-optimizer">💰 Budget Optimizer</Link>
         <Link to="/collaborate">🤝 Collaborative Trips</Link>

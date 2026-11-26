@@ -65,10 +65,20 @@ const getAdminUsers = asyncHandler(async (req, res) => {
   });
 });
 
+const VALID_ROLES = [
+  "user",
+  "admin",
+  "property_owner",
+  "transport_provider",
+  "activity_provider",
+  "tour_guide",
+];
+
 // POST /api/admin/users — Protected admin creation route
 const createAdminUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.validated;
-  const role = req.body?.role === "admin" ? "admin" : "user";
+  const requestedRole = sanitizeString(req.body?.role || "user", 30);
+  const role = VALID_ROLES.includes(requestedRole) ? requestedRole : "user";
 
   const existing = await store.findUserByEmail(email);
   if (existing) {
@@ -92,9 +102,9 @@ const createAdminUser = asyncHandler(async (req, res) => {
 
 // PATCH /api/admin/users/:id/role
 const updateUserRole = asyncHandler(async (req, res) => {
-  const role = sanitizeString(req.body?.role || "", 20);
-  if (!["user", "admin"].includes(role)) {
-    throw new ApiError(400, "Role must be 'user' or 'admin'.");
+  const role = sanitizeString(req.body?.role || "", 30);
+  if (!VALID_ROLES.includes(role)) {
+    throw new ApiError(400, `Role must be one of: ${VALID_ROLES.join(", ")}.`);
   }
   if (String(req.params.id) === String(req.user.id) && role !== "admin") {
     throw new ApiError(400, "You cannot remove your own administrator role.");
